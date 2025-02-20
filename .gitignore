@@ -1,0 +1,71 @@
+# local testing
+test.py
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.pkl
+*.db
+*.sqlite3
+*.log
+*.pot
+*.py[cod]
+*$py.class
+
+# Airflow specific files
+airflow.cfg
+airflow.db
+*.log
+*.pid
+logs/
+run/
+tmp/
+dags/__pycache__/
+*.db
+
+# DBT specific files
+*.dbt/
+target/
+dbt_packages/
+*.dbt/
+*.csv
+dbt/snapshots
+
+# Virtual Environment
+venv/
+.venv/
+env/
+.env/
+__pycache__/
+*.pyo
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# MacOS specific files
+.DS_Store
+
+# Logs
+*.log
+
+# test and build directories
+test/
+build/
+dist/
+
+# Other files that are often ignored
+*.bak
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.env
+outputs
