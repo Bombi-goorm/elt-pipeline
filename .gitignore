@@ -32,6 +32,7 @@ dbt_packages/
 *.dbt/
 *.csv
 dbt/snapshots
+local_test
 
 # Virtual Environment
 venv/

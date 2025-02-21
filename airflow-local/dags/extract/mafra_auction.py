@@ -4,8 +4,8 @@ from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.models import Variable
 from include.custom_operators.mafra_api_operator import MafraApiOperator
 
-
 AUCTION_BUCKET_NAME = Variable.get("AUCTION_BUCKET_NAME")
+
 
 @dag(
     schedule_interval="@hourly",
@@ -13,7 +13,7 @@ AUCTION_BUCKET_NAME = Variable.get("AUCTION_BUCKET_NAME")
     render_template_as_native_obj=True,
     catchup=False,
 )
-def extract_from_source():
+def extract_mafra_auction():
     extract_task = MafraApiOperator.partial(
         task_id="extract_from_source",
         start_index=1,
@@ -25,7 +25,6 @@ def extract_from_source():
         object_name = "{{ ds_nodash }}.jsonl"
         if not jsonl_data:
             raise ValueError("No data found in XCom to upload to GCS.")
-        print(type(jsonl_data))
         jsonl_string = "\n".join(jsonl_data)
         gcs_hook = GCSHook(gcp_conn_id="gcp_sample")
         gcs_hook.upload(
@@ -33,10 +32,9 @@ def extract_from_source():
             object_name=f"{kwargs['ds_nodash']}.jsonl",
             data=jsonl_string,
             mime_type="application/json",
-
         )
 
-    extract_data = extract_task.output
-    upload_to_gcs(extract_data)
+    upload_to_gcs(extract_task.output)
 
-extract_from_source()
+
+extract_mafra_auction()
