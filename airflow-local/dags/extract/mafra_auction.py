@@ -13,7 +13,7 @@ AUCTION_BUCKET_NAME = Variable.get("AUCTION_BUCKET_NAME")
     render_template_as_native_obj=True,
     catchup=False,
 )
-def extract_from_source():
+def extract_mafra_auction():
     extract_task = MafraApiOperator.partial(
         task_id="extract_from_source",
         start_index=1,
@@ -34,7 +34,7 @@ def extract_from_source():
             mime_type="application/json",
         )
 
-    extract_data = extract_task.output
-    upload_to_gcs(extract_data)
+    upload_to_gcs(extract_task.output)
 
-extract_from_source()
+
+extract_mafra_auction()

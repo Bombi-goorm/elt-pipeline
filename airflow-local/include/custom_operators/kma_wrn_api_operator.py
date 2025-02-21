@@ -1,57 +1,51 @@
 import json
 from airflow.providers.http.hooks.http import HttpHook
 from airflow.models import BaseOperator
-from typing import List
+from typing import List, Dict
 
 
 class KmaWrnApiOperator(BaseOperator):
     def __init__(self,
                  page_no: int,
                  num_of_rows: int,
-                 stn_id: int,
-                 from_tm_fc: int,
                  *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
         self.page_no = page_no
         self.num_of_rows = num_of_rows
-        self.stn_id = stn_id
-        self.from_tm_fc = from_tm_fc
 
     def execute(self, context):
-        http_hook = HttpHook(http_conn_id='mafra_api', method='GET')
+        http_hook = HttpHook(http_conn_id='kma_wrn_api', method='GET')
         conn = http_hook.get_connection(http_hook.http_conn_id)
         extra = conn.extra_dejson
         api_key = extra['api_key']
-        query_params = f"SALEDATE={context["ds_nodash"]}&WHSALCD={self.whsal_cd}"
-        url = f"openapi/{api_key}/json/Grid_20240625000000000654_1/{self.start_index}/{self.end_index}?{query_params}"
-
+        query_params = f"serviceKey={api_key}&pageNo={self.page_no}&fromTmFc={context["ds_nodash"]}&numOfRows={self.num_of_rows}&dataType=json"
+        url = f"/1360000/WthrWrnInfoService/getWthrWrnList?{query_params}"
         response = http_hook.run(endpoint=url)
-
+        host = conn.host  # 호스트 URL
+        final_url = f"{host}{url}"  # 전체 URL 생성
+        self.log.error(f"Requesting URL: {final_url}")  # 로그로 URL 확인
         if response.status_code != 200:
             self.log.error(f"API 요청 실패: {response.status_code}")
             raise Exception(f"API 요청 실패: {response.status_code}")
 
         json_data = response.json()
 
-        jsonl_data = self.__process_json_data(json_data)
+        processed_data = self.__process_json_data(json_data)
 
-        return jsonl_data
+        return processed_data
 
-    def __process_json_data(self, json_data, exclude_keys: List[str] = None) -> str:
-        exclude_keys = exclude_keys or []
+    def __process_json_data(self, json_data) -> str:
 
         try:
-            rows = json_data["Grid_20240625000000000654_1"]["row"]
+            response = json_data["response"]
+            header, body = response["header"], response["body"]
+            if header["resultCode"] == 99:
+                raise Exception()
 
-            filtered_rows = [
-                {k: v for k, v in row.items() if k not in exclude_keys}
-                for row in rows
-            ]
+            items = body["items"]
 
-            jsonl_data = "\n".join([json.dumps(row, ensure_ascii=False) for row in filtered_rows])
-
-            return jsonl_data
+            return items
         except KeyError as e:
             self.log.error(f"JSON 형식이 예상과 다릅니다. 예외 발생: {e}")
             raise

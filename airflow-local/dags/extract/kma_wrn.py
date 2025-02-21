@@ -1,7 +1,10 @@
+import json
+
 from airflow.decorators import dag, task
 from pendulum import datetime
 from airflow.models import Variable
 from include.custom_operators.kma_wrn_api_operator import KmaWrnApiOperator
+from airflow.providers.google.cloud.hooks.gcs import GCSHook
 
 AUCTION_BUCKET_NAME = Variable.get("AUCTION_BUCKET_NAME")
 
@@ -13,27 +16,25 @@ AUCTION_BUCKET_NAME = Variable.get("AUCTION_BUCKET_NAME")
     catchup=False,
 )
 def extract_kma_wrn():
-    extract_task = KmaWrnApiOperator.partial(
-        task_id="extract_from_source",
-        start_index=1,
-        end_index=1000,
-    ).expand(whsal_cd=["110001", "380401"])
+    extract_kma_wrn_data = KmaWrnApiOperator(
+        task_id="extract_kma_wrn_data",
+        page_no=1,
+        num_of_rows=1000,
+    )
 
     @task
-    def upload_to_gcs(jsonl_data, **kwargs):
-        object_name = "{{ ds_nodash }}.jsonl"
-        if not jsonl_data:
+    def upload_to_gcs(processed_data, **kwargs):
+        if not processed_data:
             raise ValueError("No data found in XCom to upload to GCS.")
-        jsonl_string = "\n".join(jsonl_data)
         gcs_hook = GCSHook(gcp_conn_id="gcp_sample")
         gcs_hook.upload(
             bucket_name=AUCTION_BUCKET_NAME,
-            object_name=f"{kwargs['ds_nodash']}.jsonl",
-            data=jsonl_string,
+            object_name=f"{kwargs['ds_nodash']}.json",
+            data=json.dumps(processed_data),
             mime_type="application/json",
         )
 
-    extract_data = extract_task.output
-    upload_to_gcs(extract_data)
+    upload_to_gcs(extract_kma_wrn_data.output)
+
 
 extract_kma_wrn()
