@@ -1,8 +1,7 @@
 from airflow.decorators import dag, task
 from pendulum import datetime
-from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.models import Variable
-from include.custom_operators.mafra_api_operator import MafraApiOperator
+from include.custom_operators.kma_wrn_api_operator import KmaWrnApiOperator
 
 AUCTION_BUCKET_NAME = Variable.get("AUCTION_BUCKET_NAME")
 
@@ -13,8 +12,8 @@ AUCTION_BUCKET_NAME = Variable.get("AUCTION_BUCKET_NAME")
     render_template_as_native_obj=True,
     catchup=False,
 )
-def extract_from_source():
-    extract_task = MafraApiOperator.partial(
+def extract_kma_wrn():
+    extract_task = KmaWrnApiOperator.partial(
         task_id="extract_from_source",
         start_index=1,
         end_index=1000,
@@ -37,4 +36,4 @@ def extract_from_source():
     extract_data = extract_task.output
     upload_to_gcs(extract_data)
 
-extract_from_source()
+extract_kma_wrn()

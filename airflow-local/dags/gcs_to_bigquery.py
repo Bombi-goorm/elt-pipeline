@@ -1,5 +1,4 @@
 from airflow.decorators import task, dag
-from airflow.operators.empty import EmptyOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from airflow.models import Variable
 from pendulum import datetime
@@ -18,7 +17,6 @@ AUCTION_TABLE = Variable.get("AUCTION_TABLE")
     description="Append daily JSONL from GCS to BigQuery"
 )
 def gcs_to_bigquery_dag():
-
 
     @task
     def load_gcs_to_bq(**kwargs):
