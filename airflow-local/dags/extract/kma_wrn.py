@@ -6,7 +6,7 @@ from airflow.models import Variable
 from include.custom_operators.kma_wrn_api_operator import KmaWrnApiOperator
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 
-AUCTION_BUCKET_NAME = Variable.get("AUCTION_BUCKET_NAME")
+GCS_KMA_WRN_BUCKET = Variable.get("GCS_KMA_WRN_BUCKET")
 
 
 @dag(
@@ -28,7 +28,7 @@ def extract_kma_wrn():
             raise ValueError("No data found in XCom to upload to GCS.")
         gcs_hook = GCSHook(gcp_conn_id="gcp_sample")
         gcs_hook.upload(
-            bucket_name=AUCTION_BUCKET_NAME,
+            bucket_name=GCS_KMA_WRN_BUCKET,
             object_name=f"{kwargs['ds_nodash']}.json",
             data=json.dumps(processed_data),
             mime_type="application/json",

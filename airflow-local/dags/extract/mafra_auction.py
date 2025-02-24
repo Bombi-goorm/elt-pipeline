@@ -4,7 +4,7 @@ from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.models import Variable
 from include.custom_operators.mafra_api_operator import MafraApiOperator
 
-AUCTION_BUCKET_NAME = Variable.get("AUCTION_BUCKET_NAME")
+GCS_MAFRA_AUCTION_BUCKET = Variable.get("GCS_MAFRA_AUCTION_BUCKET")
 
 
 @dag(
@@ -28,7 +28,7 @@ def extract_mafra_auction():
         jsonl_string = "\n".join(jsonl_data)
         gcs_hook = GCSHook(gcp_conn_id="gcp_sample")
         gcs_hook.upload(
-            bucket_name=AUCTION_BUCKET_NAME,
+            bucket_name=GCS_MAFRA_AUCTION_BUCKET,
             object_name=f"{kwargs['ds_nodash']}.jsonl",
             data=jsonl_string,
             mime_type="application/json",
