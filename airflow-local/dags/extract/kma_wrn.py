@@ -1,11 +1,9 @@
-import json
-
 from airflow.decorators import dag, task
 from pendulum import datetime
 from airflow.models import Variable
-from include.custom_operators.kma_wrn_api_operator import KmaWrnApiOperator
-from airflow.providers.google.cloud.hooks.gcs import GCSHook
+from include.custom_operators.kma.kma_wrn_api_operator import KmaWrnApiOperator
 
+GCS_KMA_WRN_BUCKET = Variable.get("GCS_KMA_WRN_BUCKET")
 
 
 @dag(
@@ -19,23 +17,10 @@ def extract_kma_wrn():
         task_id="extract_kma_wrn_data",
         page_no=1,
         num_of_rows=1000,
+        bucket_name=GCS_KMA_WRN_BUCKET,
+        file_path="{{ ds_nodash }}.jsonl"
     )
 
-    @task
-    def upload_to_gcs(processed_data, **kwargs):
-        GCS_KMA_WRN_BUCKET = Variable.get("GCS_KMA_WRN_BUCKET")
-
-        if not processed_data:
-            raise ValueError("No data found in XCom to upload to GCS.")
-        gcs_hook = GCSHook(gcp_conn_id="gcp-sample")
-        gcs_hook.upload(
-            bucket_name=GCS_KMA_WRN_BUCKET,
-            object_name=f"{kwargs['ds_nodash']}.json",
-            data=json.dumps(processed_data),
-            mime_type="application/json",
-        )
-
-    upload_to_gcs(extract_kma_wrn_data.output)
-
+    extract_kma_wrn_data
 
 extract_kma_wrn()
