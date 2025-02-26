@@ -16,7 +16,7 @@ AUCTION_TABLE = Variable.get("AUCTION_TABLE")
     catchup=True,
     description="Append daily JSONL from GCS to BigQuery"
 )
-def gcs_to_bigquery_dag():
+def gcs_to_bigquery_dag_backfill():
 
     @task
     def load_gcs_to_bq(**kwargs):
@@ -35,4 +35,4 @@ def gcs_to_bigquery_dag():
     load_gcs_to_bq()
 
 
-gcs_to_bigquery_dag()
+gcs_to_bigquery_dag_backfill()

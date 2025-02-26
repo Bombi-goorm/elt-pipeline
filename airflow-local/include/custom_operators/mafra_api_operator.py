@@ -17,7 +17,7 @@ class MafraApiOperator(BaseOperator):
         self.whsal_cd = whsal_cd
 
     def execute(self, context):
-        http_hook = HttpHook(http_conn_id='mafra_api', method='GET')
+        http_hook = HttpHook(http_conn_id='mafra-connection', method='GET')
         conn = http_hook.get_connection(http_hook.http_conn_id)
         extra = conn.extra_dejson
         api_key = extra['api_key']

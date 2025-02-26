@@ -6,22 +6,24 @@ from typing import List, Dict
 
 class KmaShortApiOperator(BaseOperator):
     def __init__(self,
-                 nx: int,
-                 ny: int,
+                 # nx: int,
+                 # ny: int,
                  base_time: str,
                  page_no: int,
                  num_of_rows: int,
+                 xy_pair: tuple,
                  *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
-        self.nx = nx
-        self.ny = ny
+        # self.nx = nx
+        # self.ny = ny
+        self.xy_pair = xy_pair
         self.base_time = base_time
         self.page_no = page_no
         self.num_of_rows = num_of_rows
 
     def execute(self, context):
-        http_hook = HttpHook(http_conn_id='kma_short_api', method='GET')
+        http_hook = HttpHook(http_conn_id='kma-connection', method='GET')
         conn = http_hook.get_connection(http_hook.http_conn_id)
         extra = conn.extra_dejson
         api_key = extra['api_key']
@@ -30,8 +32,8 @@ class KmaShortApiOperator(BaseOperator):
                         f"base_date={context["ds_nodash"]}&"
                         f"numOfRows={self.num_of_rows}&"
                         f"dataType=json&"
-                        f"baseTime={self.base_time}&"
-                        f"nx={self.nx}&ny={self.ny}")
+                        f"base_time={self.base_time}&"
+                        f"nx={self.xy_pair[0]}&ny={self.xy_pair[1]}")
 
         url = f"/1360000/VilageFcstInfoService_2.0/getVilageFcst?{query_params}"
         response = http_hook.run(endpoint=url)
@@ -41,7 +43,6 @@ class KmaShortApiOperator(BaseOperator):
             raise Exception(f"API 요청 실패: {response.status_code}")
 
         json_data = response.json()
-
         processed_data = self.__process_json_data(json_data)
 
         return processed_data
