@@ -38,7 +38,6 @@ def extract_kma_short():
         num_of_rows=290,
         base_time="0200",
         bucket_name=GCS_KMA_SHORT_BUCKET,
-        file_path="{{ ds_nodash }}/{{ params.xy_pair }}.jsonl"
         # retries=2,
     ).expand(
         xy_pair=xy_combinations,
@@ -54,7 +53,7 @@ def extract_kma_short():
         bucket=GCS_KMA_SHORT_BUCKET,
         source_objects=["{{  ds_nodash  }}/*.jsonl"],
         destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{SHORT_TABLE}",
-        write_disposition="WRITE_APPEND",
+        write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
     )
