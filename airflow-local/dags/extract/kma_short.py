@@ -1,13 +1,10 @@
-import json
-
 from airflow.decorators import dag, task
 from pendulum import datetime
 from airflow.models import Variable
-from include.custom_operators.kma_short_api_operator import KmaShortApiOperator
-from airflow.providers.google.cloud.hooks.gcs import GCSHook
+from include.custom_operators.kma.kma_short_api_operator import KmaShortApiOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 
-
+GCS_KMA_SHORT_BUCKET = Variable.get("GCS_KMA_SHORT_BUCKET")
 
 
 @dag(
@@ -40,26 +37,11 @@ def extract_kma_short():
         page_no=1,
         num_of_rows=290,
         base_time="0200",
-        retries=2,
+        bucket_name=GCS_KMA_SHORT_BUCKET,
+        # retries=2,
     ).expand(
         xy_pair=xy_combinations,
     )
-    GCS_KMA_SHORT_BUCKET = Variable.get("GCS_KMA_SHORT_BUCKET")
-    @task
-    def upload_to_gcs(processed_data, **kwargs):
-        if not processed_data:
-            raise ValueError("No data found in XCom to upload to GCS.")
-        items = processed_data['item']
-        nx, ny = items[0]['nx'], items[0]['ny']
-        jsonl_data = "\n".join([json.dumps(item, ensure_ascii=False) for item in items])
-
-        gcs_hook = GCSHook(gcp_conn_id="gcp-sample")
-        gcs_hook.upload(
-            bucket_name=GCS_KMA_SHORT_BUCKET,
-            object_name=f"{kwargs['ds_nodash']}/{nx}_{ny}.jsonl",
-            data=jsonl_data,
-            mime_type="application/json",
-        )
 
     GCP_PROJECT_ID = Variable.get("GCP_PROJECT_ID")
     KMA_DATASET = Variable.get("BQ_KMA_DATASET")
@@ -71,12 +53,12 @@ def extract_kma_short():
         bucket=GCS_KMA_SHORT_BUCKET,
         source_objects=["{{  ds_nodash  }}/*.jsonl"],
         destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{SHORT_TABLE}",
-        write_disposition="WRITE_APPEND",
+        write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
     )
 
-    upload_to_gcs.expand(processed_data=extract_kma_short_data.output) >> load_gcs_to_bq
+    extract_kma_short_data >> load_gcs_to_bq
 
 
 extract_kma_short()
