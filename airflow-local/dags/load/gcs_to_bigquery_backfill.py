@@ -24,7 +24,7 @@ def gcs_to_bigquery_dag_backfill():
         GCSToBigQueryOperator(
             task_id="gcs_to_bigquery",
             gcp_conn_id="gcp-sample",
-            bucket=GCS_MAFRA_AUCTION_BUCKET,
+            bucket="bomnet-raw",
             source_objects=[f"{kwargs["ds_nodash"]}.jsonl"],
             destination_project_dataset_table=f"{GCP_PROJECT_ID}:{AUCTION_DATASET}.{AUCTION_TABLE}",
             schema_object="mafra_auction_schema.json",

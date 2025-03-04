@@ -6,5 +6,12 @@ sources:
     schema: kma
     tables:
       - name: short
-        description: "kma short's fact table"
-
+        description: "kma short forecast fact table"
+      - name: wrn
+        description: "kma warning forecast fact table"
+  - name: mafra
+    database: goorm-bomnet
+    schema: mafra
+    tables:
+      - name: auction
+        description: "mafra near real-time auction table"

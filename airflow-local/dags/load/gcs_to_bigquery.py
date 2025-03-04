@@ -20,12 +20,11 @@ def gcs_to_bigquery_dag():
 
     @task
     def load_gcs_to_bq(**kwargs):
-        print(f"{kwargs["ds_nodash"]}.jsonl")
         GCSToBigQueryOperator(
             task_id="gcs_to_bigquery",
             gcp_conn_id="gcp-sample",
             bucket=GCS_MAFRA_AUCTION_BUCKET,
-            source_objects=[f"{kwargs["ds_nodash"]}.jsonl"],
+            source_objects=[f"mafra/auction/{kwargs["ds_nodash"]}.jsonl"],
             schema_object="mafra_auction_schema.json",
             destination_project_dataset_table=f"{GCP_PROJECT_ID}:{AUCTION_DATASET}.{AUCTION_TABLE}",
             write_disposition="WRITE_APPEND",

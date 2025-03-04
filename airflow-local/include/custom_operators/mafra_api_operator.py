@@ -32,7 +32,7 @@ class MafraApiOperator(BaseOperator):
 
         json_data = response.json()
 
-        jsonl_data = self.__process_json_data(json_data)
+        jsonl_data = self.__process_json_data(json_data, ["ROW_NUM"])
 
         return jsonl_data
 

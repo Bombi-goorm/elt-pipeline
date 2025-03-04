@@ -36,7 +36,7 @@ def extract_kma_short():
         page_no=1,
         num_of_rows=290,
         base_time="0200",
-        bucket_name="bomnet_raw",
+        bucket_name="bomnet-raw",
         # retries=2,
     ).expand(
         xy_pair=xy_combinations,
@@ -49,7 +49,7 @@ def extract_kma_short():
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
         gcp_conn_id="gcp-sample",
-        bucket="bomnet_raw",
+        bucket="bomnet-raw",
         source_objects=["kma/short/{{  ds_nodash  }}/*.jsonl"],
         schema_object="schemas/kma_short_schema.json",
         destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{SHORT_TABLE}",

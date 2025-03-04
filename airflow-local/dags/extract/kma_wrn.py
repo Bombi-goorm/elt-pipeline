@@ -18,7 +18,7 @@ def extract_kma_wrn():
         task_id="extract_kma_wrn_data",
         page_no=1,
         num_of_rows=1000,
-        bucket_name="bomnet_raw",
+        bucket_name="bomnet-raw",
     )
     GCP_PROJECT_ID = Variable.get("GCP_PROJECT_ID")
     KMA_DATASET = "kma"
@@ -26,7 +26,7 @@ def extract_kma_wrn():
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
         gcp_conn_id="gcp-sample",
-        bucket="bomnet_raw",
+        bucket="bomnet-raw",
         source_objects=["kma/wrn/{{  ds_nodash  }}.jsonl"],
         destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{WRN_TABLE}",
         schema_object="schemas/kma_wrn_schema.json",
