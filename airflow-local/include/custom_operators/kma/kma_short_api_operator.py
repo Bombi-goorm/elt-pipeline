@@ -9,7 +9,7 @@ class KmaShortApiOperator(KmaAbstractOperator):
 
     def execute(self, context):
         response = self.request_kma(context['ds_nodash'])
-        object_name = f"{context['ds_nodash']}/{self.xy_pair[0]}_{self.xy_pair[1]}.jsonl"
+        object_name = f"kma/short/{context['ds_nodash']}/{self.xy_pair[0]}_{self.xy_pair[1]}.jsonl"
         jsonl_list = self.process_json(response)
         jsonl_str = "\n".join([json.dumps(item, ensure_ascii=False) for item in jsonl_list])
         self.upload_to_gcs(jsonl_str, object_name)

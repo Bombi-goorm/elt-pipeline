@@ -4,7 +4,6 @@ from airflow.models import Variable
 from include.custom_operators.kma.kma_short_api_operator import KmaShortApiOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 
-GCS_KMA_SHORT_BUCKET = Variable.get("GCS_KMA_SHORT_BUCKET")
 
 
 @dag(
@@ -37,7 +36,7 @@ def extract_kma_short():
         page_no=1,
         num_of_rows=290,
         base_time="0200",
-        bucket_name=GCS_KMA_SHORT_BUCKET,
+        bucket_name="bomnet_raw",
         # retries=2,
     ).expand(
         xy_pair=xy_combinations,
@@ -50,8 +49,9 @@ def extract_kma_short():
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
         gcp_conn_id="gcp-sample",
-        bucket=GCS_KMA_SHORT_BUCKET,
-        source_objects=["{{  ds_nodash  }}/*.jsonl"],
+        bucket="bomnet_raw",
+        source_objects=["kma/short/{{  ds_nodash  }}/*.jsonl"],
+        schema_object="schemas/kma_short_schema.json",
         destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{SHORT_TABLE}",
         write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",

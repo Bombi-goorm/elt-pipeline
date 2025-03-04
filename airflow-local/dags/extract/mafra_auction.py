@@ -21,15 +21,13 @@ def extract_mafra_auction_backfill():
 
     @task
     def upload_to_gcs(jsonl_data, **kwargs):
-        GCS_MAFRA_AUCTION_BUCKET = Variable.get("GCS_MAFRA_AUCTION_BUCKET")
-        object_name = "{{ ds_nodash }}.jsonl"
         if not jsonl_data:
             raise ValueError("No data found in XCom to upload to GCS.")
         jsonl_string = "\n".join(jsonl_data)
         gcs_hook = GCSHook(gcp_conn_id="gcp-sample")
         gcs_hook.upload(
-            bucket_name=GCS_MAFRA_AUCTION_BUCKET,
-            object_name=f"{kwargs['ds_nodash']}.jsonl",
+            bucket_name="bomnet_raw",
+            object_name=f"mafra/auction/{kwargs['ds_nodash']}.jsonl",
             data=jsonl_string,
             mime_type="application/json",
         )

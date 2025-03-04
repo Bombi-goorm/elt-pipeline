@@ -1,9 +1,0 @@
-version: 2
-
-sources:
-  - name: short_source
-    database: goorm-bomnet
-    schema: kma
-    tables:
-      - name: short_fact
-

@@ -1,0 +1,10 @@
+[
+  {"name": "nx", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "ny", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "fcstValue", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "fcstDate", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "category", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "baseTime", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "fcstTime", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "baseDate", "type": "STRING", "mode": "NULLABLE"}
+]

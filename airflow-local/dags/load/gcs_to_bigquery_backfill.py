@@ -27,6 +27,7 @@ def gcs_to_bigquery_dag_backfill():
             bucket=GCS_MAFRA_AUCTION_BUCKET,
             source_objects=[f"{kwargs["ds_nodash"]}.jsonl"],
             destination_project_dataset_table=f"{GCP_PROJECT_ID}:{AUCTION_DATASET}.{AUCTION_TABLE}",
+            schema_object="mafra_auction_schema.json",
             write_disposition="WRITE_APPEND",
             source_format="NEWLINE_DELIMITED_JSON",
             autodetect=True,
