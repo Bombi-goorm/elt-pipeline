@@ -4,7 +4,7 @@ from airflow.providers.http.hooks.http import HttpHook
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 
 
-class KmaAbstractOperator(BaseOperator, ABC):
+class ToGCSOperator(BaseOperator, ABC):
 
     def __init__(self, page_no: int,
                  num_of_rows: int,
@@ -40,8 +40,9 @@ class KmaAbstractOperator(BaseOperator, ABC):
         )
         self.log.info(f"Uploaded to GCS: gs://{self.bucket_name}/{object_name}")
 
-    def request_kma(self, ds_nodash):
-        http_hook = HttpHook(http_conn_id='kma-connection', method='GET')
+
+    def fetch_data_go(self, conn_id: str, ds_nodash):
+        http_hook = HttpHook(http_conn_id=conn_id, method='GET')
         conn = http_hook.get_connection(http_hook.http_conn_id)
         extra = conn.extra_dejson
         api_key = extra['api_key']

@@ -17,12 +17,12 @@ class MafraApiOperator(BaseOperator):
         self.whsal_cd = whsal_cd
 
     def execute(self, context):
-        http_hook = HttpHook(http_conn_id='mafra-connection', method='GET')
+        http_hook = HttpHook(http_conn_id='mafra-connection-new', method='GET')
         conn = http_hook.get_connection(http_hook.http_conn_id)
         extra = conn.extra_dejson
         api_key = extra['api_key']
-        query_params = f"SALEDATE={context["ds_nodash"]}&WHSALCD={self.whsal_cd}"
-        url = f"openapi/{api_key}/json/Grid_20240625000000000654_1/{self.start_index}/{self.end_index}?{query_params}"
+        query_params = f"serviceKey={api_key}&pageNo={context["ds_nodash"]}&WHSALCD={self.whsal_cd}"
+        url = f"/trades?{query_params}"
 
         response = http_hook.run(endpoint=url)
 

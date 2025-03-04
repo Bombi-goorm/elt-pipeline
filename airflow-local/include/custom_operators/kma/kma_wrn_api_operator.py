@@ -1,16 +1,15 @@
-from include.custom_operators.kma.kma_abc import KmaAbstractOperator
+from include.custom_operators.data_go_abc import ToGCSOperator
 import re
 import json
 from datetime import datetime
 
 
-class KmaWrnApiOperator(KmaAbstractOperator):
+class KmaWrnApiOperator(ToGCSOperator):
 
     def execute(self, context):
-        response = self.request_kma(context['ds_nodash'])
+        response = self.fetch_data_go('kma-connection', context['ds_nodash'])
         object_name = f"kma/wrn/{context['ds_nodash']}.jsonl"
         jsonl_list = self.process_json(response)
-
 
         jsonl_str = ""
         latest_timestamp = self.extract_timestamp(jsonl_list[0]["title"])
