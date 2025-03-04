@@ -8,7 +8,7 @@ class KmaWrnApiOperator(KmaAbstractOperator):
 
     def execute(self, context):
         response = self.request_kma(context['ds_nodash'])
-        object_name = f"{context['ds_nodash']}.jsonl"
+        object_name = f"kma/wrn/{context['ds_nodash']}.jsonl"
         jsonl_list = self.process_json(response)
 
 

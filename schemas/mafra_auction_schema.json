@@ -1,0 +1,19 @@
+[
+  {"name": "SBIDTIME", "type": "DATETIME", "mode": "REQUIRED"},
+  {"name": "QTY", "type": "INTEGER", "mode": "NULLABLE"},
+  {"name": "SMALLNAME", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "MIDNAME", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "SANNAME", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "MID", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "SANCD", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "LARGENAME", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "SMALL", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "LARGE", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "WHSALCD", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "CMPNAME", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "COST", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "WHSALNAME", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "STD", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "CMPCD", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "SALEDATE", "type": "STRING", "mode": "NULLABLE"}
+]

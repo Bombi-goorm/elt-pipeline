@@ -26,6 +26,7 @@ def gcs_to_bigquery_dag():
             gcp_conn_id="gcp-sample",
             bucket=GCS_MAFRA_AUCTION_BUCKET,
             source_objects=[f"{kwargs["ds_nodash"]}.jsonl"],
+            schema_object="mafra_auction_schema.json",
             destination_project_dataset_table=f"{GCP_PROJECT_ID}:{AUCTION_DATASET}.{AUCTION_TABLE}",
             write_disposition="WRITE_APPEND",
             source_format="NEWLINE_DELIMITED_JSON",

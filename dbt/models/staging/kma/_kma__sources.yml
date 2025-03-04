@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: kma
+    database: goorm-bomnet
+    schema: kma
+    tables:
+      - name: short
+        description: "kma short's fact table"
+

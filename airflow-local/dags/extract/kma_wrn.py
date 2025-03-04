@@ -5,7 +5,6 @@ from include.custom_operators.kma.kma_wrn_api_operator import KmaWrnApiOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 
 
-GCS_KMA_WRN_BUCKET = Variable.get("GCS_KMA_WRN_BUCKET")
 
 
 @dag(
@@ -19,7 +18,7 @@ def extract_kma_wrn():
         task_id="extract_kma_wrn_data",
         page_no=1,
         num_of_rows=1000,
-        bucket_name=GCS_KMA_WRN_BUCKET,
+        bucket_name="bomnet_raw",
     )
     GCP_PROJECT_ID = Variable.get("GCP_PROJECT_ID")
     KMA_DATASET = "kma"
@@ -27,9 +26,10 @@ def extract_kma_wrn():
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
         gcp_conn_id="gcp-sample",
-        bucket=GCS_KMA_WRN_BUCKET,
-        source_objects=["{{  ds_nodash  }}.jsonl"],
+        bucket="bomnet_raw",
+        source_objects=["kma/wrn/{{  ds_nodash  }}.jsonl"],
         destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{WRN_TABLE}",
+        schema_object="schemas/kma_wrn_schema.json",
         write_disposition="WRITE_APPEND",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
