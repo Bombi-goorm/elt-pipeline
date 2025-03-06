@@ -1,7 +1,7 @@
 from airflow.decorators import dag, task
 from pendulum import datetime
 from airflow.models import Variable
-from include.custom_operators.kma.kma_short_api_operator import KmaShortApiOperator
+from include.custom_operators.kma.kma_short_api_operator import KmaShortToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 
 
@@ -31,7 +31,7 @@ def extract_kma_short():
         (120, 64),
         (120, 69)
     ]
-    extract_kma_short_data = KmaShortApiOperator.partial(
+    extract_kma_short_data = KmaShortToGCSOperator.partial(
         task_id="extract_kma_short_data",
         page_no=1,
         num_of_rows=290,

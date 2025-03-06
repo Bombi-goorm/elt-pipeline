@@ -1,13 +1,20 @@
-from include.custom_operators.data_go_abc import ToGCSOperator
+from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 import re
 import json
 from datetime import datetime
 
 
-class KmaWrnApiOperator(ToGCSOperator):
+class KmaWrnToGCSOperator(PublicDataToGCSOperator):
+    def __init__(self, page_no: int,
+                 num_of_rows: int,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.page_no = page_no
+        self.num_of_rows = num_of_rows
+
 
     def execute(self, context):
-        response = self.fetch_data_go('kma-connection', context['ds_nodash'])
+        response = self.fetch_public_data('kma-connection', context['ds_nodash'])
         object_name = f"kma/wrn/{context['ds_nodash']}.jsonl"
         jsonl_list = self.process_json(response)
 

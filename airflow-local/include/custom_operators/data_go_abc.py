@@ -4,15 +4,12 @@ from airflow.providers.http.hooks.http import HttpHook
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 
 
-class ToGCSOperator(BaseOperator, ABC):
+class PublicDataToGCSOperator(BaseOperator, ABC):
 
-    def __init__(self, page_no: int,
-                 num_of_rows: int,
+    def __init__(self,
                  bucket_name: str,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.page_no = page_no
-        self.num_of_rows = num_of_rows
         self.bucket_name = bucket_name
 
     @abstractmethod
@@ -41,7 +38,7 @@ class ToGCSOperator(BaseOperator, ABC):
         self.log.info(f"Uploaded to GCS: gs://{self.bucket_name}/{object_name}")
 
 
-    def fetch_data_go(self, conn_id: str, ds_nodash):
+    def fetch_public_data(self, conn_id: str, ds_nodash):
         http_hook = HttpHook(http_conn_id=conn_id, method='GET')
         conn = http_hook.get_connection(http_hook.http_conn_id)
         extra = conn.extra_dejson

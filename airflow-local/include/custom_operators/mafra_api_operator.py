@@ -1,10 +1,9 @@
+from include.custom_operators.data_go_abc import PublicDataToGCSOperator
+from datetime import datetime
 import json
-from airflow.providers.http.hooks.http import HttpHook
-from airflow.models import BaseOperator
-from typing import List
 
 
-class MafraApiOperator(BaseOperator):
+class MafraAuctionToGCSOperator(PublicDataToGCSOperator):
     def __init__(self,
                  start_index: int,
                  end_index: int,
@@ -17,42 +16,39 @@ class MafraApiOperator(BaseOperator):
         self.whsal_cd = whsal_cd
 
     def execute(self, context):
-        http_hook = HttpHook(http_conn_id='mafra-connection-new', method='GET')
-        conn = http_hook.get_connection(http_hook.http_conn_id)
-        extra = conn.extra_dejson
-        api_key = extra['api_key']
-        query_params = f"serviceKey={api_key}&pageNo={context["ds_nodash"]}&WHSALCD={self.whsal_cd}"
-        url = f"/trades?{query_params}"
 
-        response = http_hook.run(endpoint=url)
+        response = self.fetch_public_data('mafra-connection', context['ds_nodash'])
+        jsonl_list = self.process_json(response)
+        jsonl_str = ""
+        object_name = f"mafra/auction/{context['ds_nodash']}.jsonl"
 
-        if response.status_code != 200:
-            self.log.error(f"API 요청 실패: {response.status_code}")
-            raise Exception(f"API 요청 실패: {response.status_code}")
+        updated_at = context["ti"].xcom_pull(key="auction_updated_at", default="2025-01-01 00:00:00")
+        timestamp_updated_at = datetime.strptime(updated_at, "%Y-%m-%d %H:%M:%S")
+        latest_timestamp = jsonl_list[0]["SBIDTIME"]
 
-        json_data = response.json()
 
-        jsonl_data = self.__process_json_data(json_data, ["ROW_NUM"])
+        for auction in jsonl_list:
+            sbidtime = auction["SBIDTIME"]
+            timestamp_sbidtime = datetime.strptime(sbidtime, "%Y-%m-%d %H:%M:%S")
 
-        return jsonl_data
+            if timestamp_sbidtime <= timestamp_updated_at:
+                break
+            auction_filtered = {key: value for key, value in auction.items() if key != "ROW_NUM"}
+            jsonl_str += json.dumps(auction_filtered, ensure_ascii=False) + "\n"
 
-    def __process_json_data(self, json_data, exclude_keys: List[str] = None) -> str:
-        exclude_keys = exclude_keys or []
+        context["ti"].xcom_push(key="updated_at", value=latest_timestamp)
 
+        self.upload_to_gcs(jsonl_str, object_name)
+
+
+    def process_json(self, json_data) -> list:
         try:
             rows = json_data["Grid_20240625000000000654_1"]["row"]
-
-            filtered_rows = [
-                {k: v for k, v in row.items() if k not in exclude_keys}
-                for row in rows
-            ]
-
-            jsonl_data = "\n".join([json.dumps(row, ensure_ascii=False) for row in filtered_rows])
-
-            return jsonl_data
+            return rows
         except KeyError as e:
-            self.log.error(f"JSON 형식이 예상과 다릅니다. 예외 발생: {e}")
-            raise
-        except Exception as e:
-            self.log.error(f"데이터 처리 중 오류 발생: {e}")
-            raise
+            raise Exception("JSON 응답 형식이 다릅니다.")
+
+    def build_url(self, api_key, ds_nodash):
+        query_params = (f"SALEDATE={ds_nodash}&"
+                        f"WHSALCD={self.whsal_cd}")
+        return f"openapi/{api_key}/json/Grid_20240625000000000654_1/1/1000/?{query_params}"

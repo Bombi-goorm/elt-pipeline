@@ -1,7 +1,7 @@
 from airflow.decorators import dag, task
 from pendulum import datetime
 from airflow.models import Variable
-from include.custom_operators.kma.kma_wrn_api_operator import KmaWrnApiOperator
+from include.custom_operators.kma.kma_wrn_api_operator import KmaWrnToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 
 
@@ -14,7 +14,7 @@ from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQue
     catchup=False,
 )
 def extract_kma_wrn():
-    extract_kma_wrn_data = KmaWrnApiOperator(
+    extract_kma_wrn_data = KmaWrnToGCSOperator(
         task_id="extract_kma_wrn_data",
         page_no=1,
         num_of_rows=1000,
@@ -35,6 +35,6 @@ def extract_kma_wrn():
         autodetect=True,
     )
 
-    extract_kma_wrn_data
+    extract_kma_wrn_data >> load_gcs_to_bq
 
 extract_kma_wrn()
