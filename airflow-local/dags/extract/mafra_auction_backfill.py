@@ -17,6 +17,7 @@
 #         task_id="extract_from_source",
 #         start_index=1,
 #         end_index=1000,
+#             http_con_id='mafra-connection'
 #     ).expand(whsal_cd=["110001", "380401"])
 #
 #     @task

@@ -17,7 +17,7 @@ class MafraAuctionToGCSOperator(PublicDataToGCSOperator):
 
     def execute(self, context):
 
-        response = self.fetch_public_data('mafra-connection', context['ds_nodash'])
+        response = self.fetch_public_data(context['ds_nodash'])
         jsonl_list = self.process_json(response)
         jsonl_str = ""
         object_name = f"mafra/auction/{context['ds_nodash']}.jsonl"
@@ -25,7 +25,6 @@ class MafraAuctionToGCSOperator(PublicDataToGCSOperator):
         updated_at = context["ti"].xcom_pull(key="auction_updated_at", default="2025-01-01 00:00:00")
         timestamp_updated_at = datetime.strptime(updated_at, "%Y-%m-%d %H:%M:%S")
         latest_timestamp = jsonl_list[0]["SBIDTIME"]
-
 
         for auction in jsonl_list:
             sbidtime = auction["SBIDTIME"]
@@ -39,7 +38,6 @@ class MafraAuctionToGCSOperator(PublicDataToGCSOperator):
         context["ti"].xcom_push(key="updated_at", value=latest_timestamp)
 
         self.upload_to_gcs(jsonl_str, object_name)
-
 
     def process_json(self, json_data) -> list:
         try:

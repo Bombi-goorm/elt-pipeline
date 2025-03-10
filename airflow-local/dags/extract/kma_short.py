@@ -1,9 +1,9 @@
 from airflow.decorators import dag, task
+from airflow.providers.http.operators.http import HttpOperator
 from pendulum import datetime
 from airflow.models import Variable
 from include.custom_operators.kma.kma_short_api_operator import KmaShortToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
-
 
 
 @dag(
