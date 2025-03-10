@@ -1,0 +1,142 @@
+[
+  {
+    "name": "avgprc",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "corp_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "corp_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_lclsf_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_lclsf_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_mclsf_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_mclsf_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_sclsf_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_sclsf_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "grd_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "grd_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "hgprc",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "lwprc",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "pkg_cd",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "pkg_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "plor_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "plor_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "sz_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "sz_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "totprc",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "trd_clcln_ymd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "trd_se",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "unit_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "unit_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "unit_qty",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "unit_tot_qty",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "whsl_mrkt_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "whsl_mrkt_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  }
+]

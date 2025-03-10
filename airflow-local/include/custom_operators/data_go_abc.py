@@ -1,18 +1,18 @@
 from abc import ABC, abstractmethod
+from typing import Sequence
+
 from airflow.models import BaseOperator
 from airflow.providers.http.hooks.http import HttpHook
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 
 
-class KmaAbstractOperator(BaseOperator, ABC):
+class PublicDataToGCSOperator(BaseOperator, ABC):
+    template_fields: Sequence[str] = ("bucket_name",)
 
-    def __init__(self, page_no: int,
-                 num_of_rows: int,
+    def __init__(self,
                  bucket_name: str,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.page_no = page_no
-        self.num_of_rows = num_of_rows
         self.bucket_name = bucket_name
 
     @abstractmethod
@@ -22,7 +22,10 @@ class KmaAbstractOperator(BaseOperator, ABC):
     @staticmethod
     def process_json(json_data):
         try:
-            return json_data["response"]["body"]["items"]["item"]
+            return_value = json_data["response"]["body"]["items"]["item"]
+            if not return_value:
+                print("NO RESPONSE!!!!!!")
+            return return_value
         except KeyError:
             raise Exception("JSON 응답 형식이 다릅니다.")
 
@@ -40,12 +43,13 @@ class KmaAbstractOperator(BaseOperator, ABC):
         )
         self.log.info(f"Uploaded to GCS: gs://{self.bucket_name}/{object_name}")
 
-    def request_kma(self, ds_nodash):
-        http_hook = HttpHook(http_conn_id='kma-connection', method='GET')
+    def fetch_public_data(self, conn_id: str, ds):
+        http_hook = HttpHook(http_conn_id=conn_id, method='GET')
         conn = http_hook.get_connection(http_hook.http_conn_id)
         extra = conn.extra_dejson
         api_key = extra['api_key']
-        response = http_hook.run(endpoint=self.build_url(api_key, ds_nodash))
+        response = http_hook.run(endpoint=self.build_url(api_key, ds))
+        # TODO: use query parmas instead of endpoint!
 
         if response.status_code != 200:
             raise Exception(f"API 요청 실패: {response.status_code}")

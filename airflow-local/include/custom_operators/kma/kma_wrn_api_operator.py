@@ -1,16 +1,21 @@
-from include.custom_operators.kma.kma_abc import KmaAbstractOperator
+from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 import re
 import json
 from datetime import datetime
 
 
-class KmaWrnApiOperator(KmaAbstractOperator):
+class KmaWrnToGCSOperator(PublicDataToGCSOperator):
+    def __init__(self, page_no: int,
+                 num_of_rows: int,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.page_no = page_no
+        self.num_of_rows = num_of_rows
 
     def execute(self, context):
-        response = self.request_kma(context['ds_nodash'])
+        response = self.fetch_public_data('datago_connection', context['ds_nodash'])
         object_name = f"kma/wrn/{context['ds_nodash']}.jsonl"
         jsonl_list = self.process_json(response)
-
 
         jsonl_str = ""
         latest_timestamp = self.extract_timestamp(jsonl_list[0]["title"])

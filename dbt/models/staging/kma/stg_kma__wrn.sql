@@ -6,11 +6,12 @@ source as (
 renamed as (
 
     select
-        stnId as station_id,
+        stnid as station_id,
         title,
-        FORMAT_TIMESTAMP('%Y-%m-%d %H:%M:%S', PARSE_DATETIME('%Y%m%d%H%M', tmFc)) as fcst_date_time
+        FORMAT_TIMESTAMP(
+            '%Y-%m-%d %H:%M:%S', PARSE_DATETIME('%Y%m%d%H%M', tmfc)
+        ) as fcst_date_time
     from source
 )
 
 select * from renamed
-
