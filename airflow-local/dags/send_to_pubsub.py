@@ -1,55 +1,84 @@
-from airflow import DAG
-from airflow.providers.google.cloud.operators.pubsub import PubSubPublishMessageOperator
+from airflow.decorators import dag, task
+from pendulum import datetime
+from airflow.models import Variable, TaskInstance
+from requests import Response
+
+from custom_operators.data_go_abc import PublicDataToGCSOperator
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from datetime import datetime
 import json
 
-GCP_PROJECT_ID = "goorm-bomnet"
-PUBSUB_TOPIC = "bomnet-test"
 
-market_pairs = [
-    ["서울가락", "대전중앙"], ["부산반여", "대구매천"], ["대구매천", "부산엄궁"],
-    ["서울강서", "대전오정"], ["대전오정", "광주서부"], ["대구매천", "광주각하"],
-    ["부산엄궁", "서울강서"], ["춘천도매", "서울가락"], ["제주도매", "서울가락"],
-    ["인천구월", "수원팔달"], ["수원팔달", "천안중앙"], ["청주복합", "전주송정"],
-    ["전주서부", "대구매천"], ["인천삼산", "안산농수산"], ["안산농수산", "수원농수산"],
-    ["수원농수산", "서울가락"], ["용인농수산", "이천농수산"], ["이천농수산", "여주농수산"],
-    ["김해농수산", "진주중앙"], ["진주중앙", "창원팔용"],
-]
+@dag(
+    schedule_interval="@daily",
+    start_date=datetime(2025, 2, 18),
+    render_template_as_native_obj=True,
+    catchup=False,
+)
+def extract_kma_wrn():
+    def response_filter(responses: Response | list[Response], ti: TaskInstance) -> str:
+        updated_at = ti.xcom_pull(key="updated_at", default="2025.01.01.00:00")
+        timestamp_updated_at = datetime.strptime(updated_at, "%Y.%m.%d.%H:%M")
+        jsonl_str = ""
+        latest_timestamp = updated_at
 
-products = [
-    "배", "감귤", "양파", "양배추", "당근", "딸기", "블루베리", "오렌지",
-    "감자", "고구마", "옥수수", "참외", "수박", "멜론", "양파대파", "깻잎",
-    "상추", "브로콜리", "토마토", "애호박", "파프리카"
-]
+        for res in responses:
+            content = res.json()
+            if not content["response"].get("body"):
+                break
+            item_list = content["response"]["body"]["items"]["item"]
+            for wrn_item in item_list:
+                ts = wrn_item["tmFc"]
+                timestamp_ts = datetime.strptime(ts, "%Y.%m.%d.%H:%M")
+                latest_timestamp = max(latest_timestamp, timestamp_ts)
+                if timestamp_ts <= timestamp_updated_at:
+                    break
+                jsonl_str += json.dumps(wrn_item, ensure_ascii=False) + "\n"
+        ti.xcom_push(key="updated_at", value=latest_timestamp)
+        return jsonl_str
 
-messages = []
-for idx, (markets, product) in enumerate(zip(market_pairs, products), start=1):
-    message_data = {
-        "user_id": f"user_{idx}",
-        "product": product,
-        "price": "3000 +inf",
-        "markets": markets
-    }
-    messages.append({"data": json.dumps(message_data, ensure_ascii=False).encode("utf-8")})
+    def paginate(response: Response) -> dict | None:
+        content = response.json()
+        if not content["response"].get("body"):
+            return None
+        body = content["response"]["body"]
+        total_count = body["totalCount"]
+        cur_page_no = body["pageNo"]
+        cur_num_of_rows = body["numOfRows"]
+        if cur_page_no * cur_num_of_rows < total_count:
+            return dict(params={"pageNo": cur_page_no + 1, })
 
-# DAG 정의
-default_args = {
-    "start_date": datetime(2025, 3, 7),
-    "catchup": False
-}
-
-with DAG(
-        dag_id="send_to_pubsub",
-        schedule_interval="*/1 * * * *",  # 매 1분마다 실행
-        default_args=default_args,
-        tags=["pubsub", "airflow"],
-) as dag:
-    publish_task = PubSubPublishMessageOperator(
-        task_id="publish_to_pubsub",
-        gcp_conn_id="gcp-sample",
-        project_id=GCP_PROJECT_ID,
-        topic=PUBSUB_TOPIC,
-        messages=messages
+    extract_kma_wrn_data = PublicDataToGCSOperator(
+        task_id="extract_kma_wrn",
+        bucket_name="bomnet-raw",
+        data={
+            "pageNo": 1,
+            "numOfRows": 100,
+            "dataType": "json"
+        },
+        object_name=f"kma/wrn/{{ ds_nodash }}.jsonl",
+        endpoint="/1360000/WthrWrnInfoService/getWthrWrnList",
+        response_filter=response_filter,
+        pagination_function=paginate,
+        api_type=("query", "serviceKey")
     )
 
-    publish_task
+    GCP_PROJECT_ID = Variable.get("GCP_PROJECT_ID")
+    KMA_DATASET = "kma"
+    WRN_TABLE = "wrn"
+    load_gcs_to_bq = GCSToBigQueryOperator(
+        task_id="load_gcs_to_bq",
+        gcp_conn_id="gcp-sample",
+        bucket="bomnet-raw",
+        source_objects=["kma/wrn/{{ ds_nodash }}.jsonl"],
+        destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{WRN_TABLE}",
+        schema_object="schemas/kma_wrn_schema.json",
+        write_disposition="WRITE_APPEND",
+        source_format="NEWLINE_DELIMITED_JSON",
+        autodetect=True,
+    )
+
+    extract_kma_wrn_data >> load_gcs_to_bq
+
+
+extract_kma_wrn()

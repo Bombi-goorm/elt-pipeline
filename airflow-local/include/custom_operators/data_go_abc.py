@@ -80,7 +80,7 @@ class PublicDataToGCSOperator(BaseOperator):
         if self.expanded_data:
             self.data.update(self.expanded_data)
             for key, value in self.expanded_data.items():
-                self.object_name += f"_{key}_{value}"
+                self.object_name += f"{value}_"
             self.object_name += ".jsonl"
         self.log.info(f"data: {self.data}")
         http_hook = HttpHook(http_conn_id=self.http_conn_id, method='GET')

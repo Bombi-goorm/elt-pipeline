@@ -4,7 +4,6 @@ from airflow.models import Variable, TaskInstance
 from requests import Response
 
 from custom_operators.data_go_abc import PublicDataToGCSOperator
-# from include.custom_operators.kma.kma_wrn_api_operator import KmaWrnToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from datetime import datetime
 import json
@@ -59,18 +58,10 @@ def extract_kma_wrn():
         },
         object_name=f"kma/wrn/{{ ds_nodash }}.jsonl",
         endpoint="/1360000/WthrWrnInfoService/getWthrWrnList",
-        # response_check=lambda response: response.json()["body"]["resultCode"] == "00",
         response_filter=response_filter,
         pagination_function=paginate,
         api_type=("query", "serviceKey")
     )
-
-    # extract_kma_wrn_data = KmaWrnToGCSOperator(
-    #     task_id="extract_kma_wrn_data",
-    #     page_no=1,
-    #     num_of_rows=10,
-    #     bucket_name="bomnet-raw",
-    # )
 
     GCP_PROJECT_ID = Variable.get("GCP_PROJECT_ID")
     KMA_DATASET = "kma"
@@ -79,7 +70,7 @@ def extract_kma_wrn():
         task_id="load_gcs_to_bq",
         gcp_conn_id="gcp-sample",
         bucket="bomnet-raw",
-        source_objects=["kma/wrn/{{  ds_nodash  }}.jsonl"],
+        source_objects=["kma/wrn/{{ ds_nodash }}.jsonl"],
         destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{WRN_TABLE}",
         schema_object="schemas/kma_wrn_schema.json",
         write_disposition="WRITE_APPEND",
