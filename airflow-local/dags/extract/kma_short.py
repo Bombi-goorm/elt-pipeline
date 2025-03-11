@@ -2,12 +2,15 @@ from airflow.decorators import dag, task
 from airflow.providers.http.operators.http import HttpOperator
 from pendulum import datetime
 from airflow.models import Variable
+from requests import Response
+from custom_operators.data_go_abc import PublicDataToGCSOperator
 from include.custom_operators.kma.kma_short_api_operator import KmaShortToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+import json
 
 
 @dag(
-    schedule_interval="@hourly",
+    schedule_interval="@daily",
     start_date=datetime(2025, 2, 18),
     render_template_as_native_obj=True,
     catchup=False,
@@ -31,16 +34,41 @@ def extract_kma_short():
         (120, 64),
         (120, 69)
     ]
-    extract_kma_short_data = KmaShortToGCSOperator.partial(
+    xy_combinations = [{"nx": x, "ny": y} for x, y in xy_combinations]
+
+    def response_filter(responses: Response | list[Response]) -> str:
+        jsonl_str = ""
+        if type(responses) == list:
+            for res in responses:
+                print(type(res))
+                print(res.text)
+
+                content = res.json()
+                item = content["response"]["body"]["items"]["item"]
+                jsonl_str += json.dumps(item, ensure_ascii=False) + "\n"
+        else:
+            print(responses.text)
+
+            content = responses.json()
+            item_list = content["response"]["body"]["items"]["item"]
+            jsonl_str = "\n".join([json.dumps(item, ensure_ascii=False) for item in item_list])
+        return jsonl_str
+
+    extract_kma_short_data = PublicDataToGCSOperator.partial(
         task_id="extract_kma_short_data",
-        page_no=1,
-        num_of_rows=290,
-        base_time="0200",
         bucket_name="bomnet-raw",
-        # retries=2,
-    ).expand(
-        xy_pair=xy_combinations,
-    )
+        object_name="kma/short/{{ ds_nodash }}/",
+        endpoint="/1360000/VilageFcstInfoService_2.0/getVilageFcst",
+        data={
+            "pageNo": 1,
+            "numOfRows": 290,
+            "base_time": "0200",
+            "base_date": "{{ ds_nodash }}",
+            "dataType": "json"
+        },
+        api_type=("query", "serviceKey"),
+        response_filter=response_filter,
+    ).expand(expanded_data=xy_combinations)
 
     GCP_PROJECT_ID = Variable.get("GCP_PROJECT_ID")
     KMA_DATASET = Variable.get("BQ_KMA_DATASET")

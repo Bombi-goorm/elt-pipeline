@@ -1,6 +1,8 @@
 from airflow.decorators import dag, task
 from airflow.providers.http.operators.http import HttpOperator
 from pendulum import datetime
+
+from custom_operators.data_go_abc import PublicDataToGCSOperator
 from include.custom_operators.mafra.mafra_kat_sale_operator import MafraKatSaleToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from airflow.providers.http.sensors.http import HttpSensor
@@ -8,6 +10,7 @@ from json import JSONDecodeError
 from airflow.exceptions import AirflowBadRequest
 import json
 from datetime import timedelta
+from requests import Response
 
 
 @dag(
@@ -39,7 +42,7 @@ def kat_sale_to_bigquery():
             "serviceKey": "{{ conn.datago_connection.extra_dejson.api_key }}",
             "pageNo": "1",
             "numOfRows": "1",
-            "cond[trd_clcln_ymd::EQ]": "2025-03-07",
+            "cond[trd_clcln_ymd::EQ]": "{{ yesterday_ds }}",
             "cond[whsl_mrkt_cd::EQ]": "110001"
         },
         response_check=lambda response: validate_api_response(response),
@@ -48,32 +51,28 @@ def kat_sale_to_bigquery():
         mode="poke",
     )
 
-    # @task
-    # def get_whole_sale_codes():
-    #     return Variable.get("whole_sale_codes", deserialize_json=True)
-    def safe_response_filter(response):
-        try:
-            if not response.text.strip():
+    def safe_response_filter(responses: Response | list[Response]):
+        jsonl_str = ""
+        for res in responses:
+            if not res.text.strip():
                 raise ValueError("API returned an empty response")
-
-            json_data = response.json()
-            total_count = json_data["response"]["body"]["totalCount"]
+            content = res.json()
+            total_count = content["response"]["body"]["totalCount"]
+            item_list = content["response"]["body"]["items"]["item"]
+            jsonl_str = "\n".join([json.dumps(item, ensure_ascii=False) for item in item_list])
             if total_count == 0:
                 return None
-            whsl_code = json_data["response"]["body"]["items"]["item"][0]["whsl_mrkt_cd"]
-            result = {whsl_code: total_count}
-            return result
-
-        except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON response: {response.text}") from e
-        except KeyError as e:
-            raise ValueError(f"Missing expected fields in response: {response.text}") from e
+        return jsonl_str
 
     codes = ["210001", "210009", "380201", "370101", "320201", "320101", "320301", "110001", "110008",
              "310101", "310401", "310901", "311201", "230001", "230003", "360301", "240001", "240004", "350402",
              "350301", "350101", "250001", "250003", "330101", "340101", "330201", "370401", "371501", "220001",
              "380401", "380101", "380303"]
 
+    # codes = ["110001"]
+
+    # """
+    # """
     # count_whsl = HttpOperator.partial(
     #     task_id="count_whsl",
     #     http_conn_id="datago_connection",
@@ -110,17 +109,49 @@ def kat_sale_to_bigquery():
     # flattened_page = flatten_page_info(page_info)
     # flattened_page_info = [item for sublist in page_info for item in sublist]
 
-    kat_sale_to_gcs = MafraKatSaleToGCSOperator.partial(
+    # kat_sale_to_gcs = MafraKatSaleToGCSOperator.partial(
+    #     task_id="kat_sale_to_gcs",
+    #     bucket_name="{{ var.value.gcs_raw_bucket }}",
+    #     numOfRows="1000",
+    #     pageNo=1,
+    #     retries=5,
+    #     retry_delay=timedelta(minutes=1),
+    # ).expand(whsl_mrkt_cd=codes)
+
+    def paginate(response: Response) -> dict | None:
+        content = response.json()
+        if not content["response"].get("body"):
+            return None
+        body = content["response"]["body"]
+        total_count = body["totalCount"]
+        cur_page_no = body["pageNo"]
+        cur_num_of_rows = body["numOfRows"]
+        if cur_page_no * cur_num_of_rows < total_count:
+            return dict(params={"pageNo": cur_page_no + 1, })
+
+    kat_sale_to_gcs = PublicDataToGCSOperator.partial(
         task_id="kat_sale_to_gcs",
         bucket_name="{{ var.value.gcs_raw_bucket }}",
-        numOfRows="1000",
-        pageNo=1,
-        retries=5,
+        object_name="mafra/kat_sale/{{ ds_nodash }}/",
+        endpoint="B552845/katSale/trades",
+        data={
+            "pageNo": 1,
+            "numOfRows": 1000,
+            "cond[trd_clcln_ymd::EQ]": "{{ yesterday_ds }}",
+            # "cond[whsl_mrkt_cd::EQ]": "110001",
+        },
+        retries=2,
         retry_delay=timedelta(minutes=1),
-    ).expand(whsl_mrkt_cd=codes)
+        response_filter=safe_response_filter,
+        pagination_function=paginate,
+        api_type=("query", "serviceKey")
+    ).expand(
+        expanded_data=[{"cond[whsl_mrkt_cd::EQ]": code} for code in codes]
+    )
 
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
+        trigger_rule='none_failed',
         gcp_conn_id="gcp-sample",
         bucket="{{ var.value.gcs_raw_bucket }}",
         source_objects=["mafra/kat_sale/*.jsonl"],
