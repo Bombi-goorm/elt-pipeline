@@ -61,7 +61,7 @@ def extract_mafra_kat_real_time():
         api_type=("query", "serviceKey")
     )
 
-    kat_real_time_to_gcs()
+    kat_real_time_to_gcs
 
 
 extract_mafra_kat_real_time()
