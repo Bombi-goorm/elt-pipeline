@@ -1,4 +1,5 @@
 from typing import Sequence
+from airflow.datasets import Dataset, DatasetAlias
 
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
@@ -29,6 +30,7 @@ class PublicDataToGCSOperator(BaseOperator):
                  http_conn_id: str = "datago_connection",
                  gcp_conn_id: str = "gcp-sample",
                  mime_type: str = "application/json",
+                 alias_name: str = None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.bucket_name = bucket_name
@@ -45,12 +47,17 @@ class PublicDataToGCSOperator(BaseOperator):
         self.http_conn_id = http_conn_id
         self.gcp_conn_id = gcp_conn_id
         self.mime_type = mime_type
+        self.alias_name = alias_name
 
     def execute(self, context: Context):
         self.log.info("Calling HTTP method")
         processed_response = self._fetch_public_data(context)
         if processed_response:
             self.upload_to_gcs(processed_response)
+            if self.alias_name:
+                print(f"alias name {self.alias_name} is set!!, execution time is {context['ds']}")
+                dataset_uri = f"gcs://{self.bucket_name}/{self.object_name}"
+                context["outlet_events"][self.alias_name].add(Dataset(dataset_uri), extra={"ds": context['ds']})
         else:
             raise AirflowSkipException("There is no response. so skip it.")
 

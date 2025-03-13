@@ -1,10 +1,14 @@
 from datetime import datetime
-from airflow.decorators import dag
+from airflow.decorators import dag, task
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from requests import Response
 import json
 from typing import Optional, Dict, List, Union
+from airflow.datasets import Dataset, DatasetAlias
 
 from custom_operators.data_go_abc import PublicDataToGCSOperator
+
+real_time_alias = "kat_real_time_gcs"
 
 
 @dag(
@@ -49,8 +53,22 @@ def kat_real_time_to_gcs():
         endpoint="B552845/katRealTime/trades",
         response_filter=safe_response_filter,
         pagination_function=paginate,
-        api_type=("query", "serviceKey")
+        api_type=("query", "serviceKey"),
+        outlets=[DatasetAlias(real_time_alias)],
+        alias_name=real_time_alias,
     )
+    load_gcs_to_bq = GCSToBigQueryOperator(
+        task_id="load_gcs_to_bq",
+        gcp_conn_id="gcp-sample",
+        bucket="bomnet-raw",
+        source_objects=["mafra/real_time/{{ ds_nodash }}.jsonl"],
+        destination_project_dataset_table=f"{"goorm-bomnet"}:{"mafra"}.{"real_time"}",
+        schema_object="schemas/kat_real_time_schema.json",
+        write_disposition="WRITE_APPEND",
+        source_format="NEWLINE_DELIMITED_JSON",
+        autodetect=True,
+    )
+    price_to_gcs >> load_gcs_to_bq
 
 
 kat_real_time_to_gcs()

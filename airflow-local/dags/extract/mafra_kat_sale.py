@@ -1,4 +1,4 @@
-from airflow.decorators import dag, task
+from airflow.decorators import dag
 from pendulum import datetime
 
 from custom_operators.data_go_abc import PublicDataToGCSOperator
@@ -81,7 +81,7 @@ def kat_sale_to_bigquery():
     kat_sale_to_gcs = PublicDataToGCSOperator.partial(
         task_id="kat_sale_to_gcs",
         bucket_name="{{ var.value.gcs_raw_bucket }}",
-        object_name="mafra/kat_sale/{{ ds_nodash }}/",
+        object_name="mafra/kat_sale/{{ yesterday_ds }}/",
         endpoint="B552845/katSale/trades",
         data={
             "pageNo": 1,

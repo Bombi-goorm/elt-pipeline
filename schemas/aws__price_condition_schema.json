@@ -1,0 +1,57 @@
+[
+  {
+    "name": "notification_condition_id",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "member_id",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "target_price",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "category",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "item",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "region",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "variety",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "price_direction",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "active",
+    "type": "BOOLEAN",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "created_date",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "last_modified_date",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+  }
+]
