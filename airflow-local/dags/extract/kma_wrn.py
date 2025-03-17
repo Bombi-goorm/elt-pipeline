@@ -1,8 +1,6 @@
-from airflow.decorators import dag, task
-from pendulum import datetime
-from airflow.models import Variable, TaskInstance
+from airflow.decorators import dag
+from airflow.models import Variable
 from requests import Response
-
 from custom_operators.data_go_abc import PublicDataToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from datetime import datetime
@@ -15,26 +13,15 @@ import json
     render_template_as_native_obj=True,
     catchup=False,
 )
-def extract_kma_wrn():
-    def response_filter(responses: Response | list[Response], ti: TaskInstance) -> str:
-        updated_at = ti.xcom_pull(key="updated_at", default="2025.01.01.00:00")
-        timestamp_updated_at = datetime.strptime(updated_at, "%Y.%m.%d.%H:%M")
+def kma_wrn_to_bigquery():
+    def response_filter(responses: Response | list[Response]) -> str:
         jsonl_str = ""
-        latest_timestamp = updated_at
-
         for res in responses:
+            print(type(res))
+            print(res.text)
             content = res.json()
-            if not content["response"].get("body"):
-                break
             item_list = content["response"]["body"]["items"]["item"]
-            for wrn_item in item_list:
-                ts = wrn_item["tmFc"]
-                timestamp_ts = datetime.strptime(ts, "%Y.%m.%d.%H:%M")
-                latest_timestamp = max(latest_timestamp, timestamp_ts)
-                if timestamp_ts <= timestamp_updated_at:
-                    break
-                jsonl_str += json.dumps(wrn_item, ensure_ascii=False) + "\n"
-        ti.xcom_push(key="updated_at", value=latest_timestamp)
+            jsonl_str = "\n".join([json.dumps(item, ensure_ascii=False) for item in item_list])
         return jsonl_str
 
     def paginate(response: Response) -> dict | None:
@@ -56,7 +43,7 @@ def extract_kma_wrn():
             "numOfRows": 100,
             "dataType": "json"
         },
-        object_name=f"kma/wrn/{{ ds_nodash }}.jsonl",
+        object_name="kma/wrn/{{ ds_nodash }}.jsonl",
         endpoint="/1360000/WthrWrnInfoService/getWthrWrnList",
         response_filter=response_filter,
         pagination_function=paginate,
@@ -73,7 +60,7 @@ def extract_kma_wrn():
         source_objects=["kma/wrn/{{ ds_nodash }}.jsonl"],
         destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{WRN_TABLE}",
         schema_object="schemas/kma_wrn_schema.json",
-        write_disposition="WRITE_APPEND",
+        write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
     )
@@ -81,4 +68,4 @@ def extract_kma_wrn():
     extract_kma_wrn_data >> load_gcs_to_bq
 
 
-extract_kma_wrn()
+kma_wrn_to_bigquery()

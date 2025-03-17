@@ -6,7 +6,7 @@ source as (
 renamed as (
 
     select
-        stnid as station_id,
+        stnid as stn_id,
         title,
         FORMAT_TIMESTAMP(
             '%Y-%m-%d %H:%M:%S', PARSE_DATETIME('%Y%m%d%H%M', tmfc)

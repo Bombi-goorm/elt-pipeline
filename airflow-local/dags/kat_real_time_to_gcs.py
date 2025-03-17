@@ -64,7 +64,7 @@ def kat_real_time_to_gcs():
         source_objects=["mafra/real_time/{{ ds_nodash }}.jsonl"],
         destination_project_dataset_table=f"{"goorm-bomnet"}:{"mafra"}.{"real_time"}",
         schema_object="schemas/kat_real_time_schema.json",
-        write_disposition="WRITE_APPEND",
+        write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
     )

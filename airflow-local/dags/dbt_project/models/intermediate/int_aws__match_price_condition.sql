@@ -10,13 +10,13 @@ matched_table as (
         target_price,
         price_direction,
         rt_price as matched_price,
-        variety,
+        pc.variety,
         whsl_mrkt_nm,
-        scsbd_dt
+        date_time
     FROM {{ source('aws_rds', 'price_conditions') }} pc
     JOIN real_time rt
         ON pc.active = TRUE
-        AND pc.variety = rt.gds_sclsf_nm
+        AND pc.variety = rt.variety
         AND (
             (pc.price_direction = 'U' AND rt.rt_price >= pc.target_price)
             OR
@@ -34,7 +34,7 @@ ranked AS (
     FROM matched_table
 )
 
-SELECT member_id, target_price, matched_price, variety, whsl_mrkt_nm, price_direction, scsbd_dt
+SELECT member_id, target_price, matched_price, variety, whsl_mrkt_nm, price_direction, date_time
 FROM ranked
 WHERE rn = 1
 

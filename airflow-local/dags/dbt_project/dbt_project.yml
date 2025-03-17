@@ -1,4 +1,4 @@
-name: 'bombi'
+name: 'bomnet'
 version: '1.0.0'
 
 
@@ -11,11 +11,17 @@ macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 profile: bigquery-db
 
+seeds:
+  bomnet:
+    weather_stations:
+      +column_types:
+        stn_id: string
+
 models:
 #  goorm-bomnet:
     +materialized: table
 
 target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+clean-targets:         # directories to be removed by `dbt_project clean`
   - "target"
   - "dbt_packages"

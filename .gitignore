@@ -30,7 +30,6 @@ dags/__pycache__/
 target/
 dbt_packages/
 *.dbt/
-*.csv
 dbt/snapshots
 local_test
 
