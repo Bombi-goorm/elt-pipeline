@@ -14,6 +14,14 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Debug Google Cloud Auth
+        run: |
+          gcloud auth list
+          gcloud config list
+      - name: Check Current GCP Project
+        run: |
+        echo "Current Project: $(gcloud config get-value project)"
+
       - name: Set up environment variables
         run: |
           echo "PROJECT_ID=${{ vars.GCP_PROJECT_ID }}" >> $GITHUB_ENV
@@ -21,4 +29,4 @@ jobs:
 
       - name: Upload DAGs to GCS
         run: |
-          gsutil -m rsync -r cdjsoifjoweifjioewjfowefj gs://$BUCKET_NAME/dags
+          gsutil -m rsync -r airflow-local/dags gs://$BUCKET_NAME/dags
