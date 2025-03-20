@@ -24,4 +24,4 @@ sources:
     schema: aws_rds
     tables:
       - name: price_conditions
-        description: "price conditions from asw rds"
+        description: "price conditions from aws rds"
