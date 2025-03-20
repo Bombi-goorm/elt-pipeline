@@ -4,7 +4,8 @@ with sale as (
         SAFE_DIVIDE(avgprc, unit_qty) as avg_ppk,
         grd_nm,
         whsl_mrkt_nm,
-        variety
+        variety,
+        item
     from {{ ref('stg_mafra_kat_sale') }}
 ),
 
@@ -12,11 +13,12 @@ variety_price_trend as (
     select
         date_time,
         safe_cast(avg(avg_ppk) as int64) as avg_ppk,
-        variety
+        variety,
+        item
     from sale
 {#    where whsl_mrkt_nm = '서울가락'#}
-    group by variety, date_time
-    order by variety, date_time
+    group by item, variety, date_time
+    order by item, variety, date_time
 )
 
 select *
