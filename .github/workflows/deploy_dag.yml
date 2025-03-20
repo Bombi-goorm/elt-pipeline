@@ -20,7 +20,7 @@ jobs:
           gcloud config list
       - name: Check Current GCP Project
         run: |
-        echo "Current Project: $(gcloud config get-value project)"
+          echo "Current Project: $(gcloud config get-value project)"
 
       - name: Set up environment variables
         run: |
