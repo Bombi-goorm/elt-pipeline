@@ -17,6 +17,25 @@ jobs:
       - name: Debug configurationfdsljfsodifjweowef
         run : gcloud storage buckets list --project=goorm-bomnet
 
+      - name: Debug Google Cloud Auth
+        run: |
+          echo "🔍 현재 인증된 계정 목록:"
+          gcloud auth list
+          echo "🔍 현재 gcloud 설정된 프로젝트:"
+          gcloud config get-value project
+          
+      - name: Check GCS Bucket IAM Policy
+        run: |
+          echo "🔍 버킷 IAM 정책 확인:"
+          gcloud storage buckets get-iam-policy asia-northeast3-goorm-envir-f14a327b-bucket
+      - name: Check Current User GCS Permissions
+        run: |
+          echo "🔍 현재 인증된 계정이 GCS에서 어떤 권한을 가지고 있는지 확인:"
+          gcloud storage buckets get-iam-policy asia-northeast3-goorm-envir-f14a327b-bucket --format=json | jq '.bindings[] | select(.members[] | contains("serviceAccount:$(gcloud auth list --format="value(account)")"))'
+      - name: Test GCS Access
+        run: |
+          echo "🔍 현재 계정으로 버킷 내부 파일 조회 테스트:"
+          gcloud storage ls gs://asia-northeast3-goorm-envir-f14a327b-bucket/
 
       - name: Set up environment variables
         run: |
