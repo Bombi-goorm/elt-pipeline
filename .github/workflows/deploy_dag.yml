@@ -9,6 +9,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - run: ls -al
 
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
