@@ -12,7 +12,7 @@ class KmaShortToGCSOperator(PublicDataToGCSOperator):
         self.xy_pair = xy_pair
 
     def execute(self, context):
-        response = self.fetch_public_data('datago_connection', context['ds_nodash'])
+        response = self.fetch_public_data(context['ds_nodash'])
         object_name = f"kma/short/{context['ds_nodash']}/{self.xy_pair[0]}_{self.xy_pair[1]}.jsonl"
         jsonl_list = self.process_json(response)
         jsonl_str = "\n".join([json.dumps(item, ensure_ascii=False) for item in jsonl_list])

@@ -18,7 +18,7 @@ class MafraKatSaleToGCSOperator(PublicDataToGCSOperator):
         print(context['yesterday_ds'])
         print(context['ds'])
         print(context['ts'])
-        response = self.fetch_public_data('datago_connection', context['yesterday_ds'])
+        response = self.fetch_public_data(context['yesterday_ds'])
         object_name = f"mafra/kat_sale/{self.whsl_mrkt_cd}/{context['ds_nodash']}.jsonl"
 
         jsonl_list = self.process_json(response)

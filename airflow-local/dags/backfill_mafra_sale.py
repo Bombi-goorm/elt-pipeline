@@ -1,5 +1,6 @@
 from airflow.decorators import dag
 from pendulum import datetime
+# from cosmos import DbtDag, ProjectConfig, ProfileConfig, ExecutionConfig
 
 from custom_operators.data_go_abc import PublicDataToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
@@ -11,13 +12,17 @@ from datetime import timedelta
 from requests import Response
 
 
+# DbtDag
+
+
 @dag(
     schedule_interval="@daily",
-    start_date=datetime(2025, 1, 1),
+    start_date=datetime(2025, 3, 18),
+    end_date=datetime(2025, 3, 19),
     render_template_as_native_obj=True,
-    catchup=False,
+    catchup=True,
 )
-def kat_sale_to_bigquery():
+def backfill_mafra_sale2():
     def validate_api_response(response) -> bool:
         try:
             json_data = response.json()
@@ -30,24 +35,6 @@ def kat_sale_to_bigquery():
         total_count = json_data["response"]["body"]["totalCount"]
         print(f"Total Count : {json_data["response"]}")
         return False if total_count == 0 else True
-
-    health_check_kat_sale = HttpSensor(
-        task_id="health_check_kat_sale",
-        http_conn_id="datago_connection",
-        endpoint="B552845/katSale/trades",
-        method="GET",
-        request_params={
-            "serviceKey": "{{ conn.datago_connection.extra_dejson.api_key }}",
-            "pageNo": "1",
-            "numOfRows": "1",
-            "cond[trd_clcln_ymd::EQ]": "{{ yesterday_ds }}",
-            "cond[whsl_mrkt_cd::EQ]": "110001"
-        },
-        response_check=lambda response: validate_api_response(response),
-        poke_interval=30,
-        timeout=600,
-        mode="poke",
-    )
 
     def safe_response_filter(responses: Response | list[Response]):
         jsonl_str = ""
@@ -112,7 +99,7 @@ def kat_sale_to_bigquery():
         autodetect=True,
     )
 
-    health_check_kat_sale >> kat_sale_to_gcs >> load_gcs_to_bq
+    kat_sale_to_gcs >> load_gcs_to_bq
 
 
-kat_sale_to_bigquery()
+backfill_mafra_sale2()

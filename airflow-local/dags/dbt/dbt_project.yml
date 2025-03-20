@@ -1,4 +1,4 @@
-name: 'bombi'
+name: 'bomnet'
 version: '1.0.0'
 
 
@@ -10,6 +10,12 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 profile: bigquery-db
+
+seeds:
+  bomnet:
+    weather_stations:
+      +column_types:
+        stn_id: string
 
 models:
 #  goorm-bomnet:

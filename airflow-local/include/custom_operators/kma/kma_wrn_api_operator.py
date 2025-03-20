@@ -11,9 +11,9 @@ class KmaWrnToGCSOperator(PublicDataToGCSOperator):
         super().__init__(*args, **kwargs)
         self.page_no = page_no
         self.num_of_rows = num_of_rows
-
+        
     def execute(self, context):
-        response = self.fetch_public_data('datago_connection', context['ds_nodash'])
+        response = self.fetch_public_data()
         object_name = f"kma/wrn/{context['ds_nodash']}.jsonl"
         jsonl_list = self.process_json(response)
 

@@ -1,0 +1,137 @@
+[
+  {
+    "name": "auctn_seq",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "scsbd_dt",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "trd_clcln_ymd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "whsl_mrkt_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "whsl_mrkt_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "corp_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "corp_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_lclsf_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_lclsf_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_mclsf_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_mclsf_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_sclsf_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "gds_sclsf_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "corp_gds_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "corp_gds_item_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "corp_gds_vrty_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "plor_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "plor_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "scsbd_prc",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "qty",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "unit_qty",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "unit_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "unit_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "pkg_cd",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "pkg_nm",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "spm_no",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "trd_se",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  }
+]

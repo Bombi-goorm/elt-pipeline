@@ -17,3 +17,11 @@ sources:
         description: "mafra near real-time auction table"
       - name: kat_sale
         description: "mafra-kat sale information table"
+      - name: real_time
+        description: "mafra-kat sale information table"
+  - name: aws_rds
+    database: goorm-bomnet
+    schema: aws_rds
+    tables:
+      - name: price_conditions
+        description: "price conditions from aws rds"

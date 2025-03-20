@@ -30,7 +30,6 @@ dags/__pycache__/
 target/
 dbt_packages/
 *.dbt/
-*.csv
 dbt/snapshots
 local_test
 
@@ -71,3 +70,15 @@ dist/
 *.sublime-workspace
 .env
 outputs
+
+# gcp-terraform
+
+terraform.tfstate
+terraform.tfstate.backup
+
+.terraform/
+.terraform.lock.hcl
+
+terraform.tfvars
+*.tfvars
+crash.log
