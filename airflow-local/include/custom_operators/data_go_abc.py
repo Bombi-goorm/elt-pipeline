@@ -12,6 +12,7 @@ from airflow.utils.context import Context
 from airflow.exceptions import AirflowSkipException
 
 
+# fds
 class PublicDataToGCSOperator(BaseOperator):
     template_fields: Sequence[str] = ("bucket_name", "object_name", "data")
 
