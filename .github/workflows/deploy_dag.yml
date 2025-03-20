@@ -46,6 +46,9 @@ jobs:
         run: |
           echo "🔍 GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}"
           echo "🔍 GCS_BUCKET_NAME: ${{ vars.GCS_BUCKET_NAME }}"
+      - name: Debug Environment Variables Before Upload
+        run: |
+          echo "🔍 Using BUCKET_NAME: $BUCKET_NAME"
 
 
       - name: Upload DAGs to GCS (Use gcloud storage instead of gsutil)
