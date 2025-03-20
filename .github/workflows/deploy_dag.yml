@@ -22,7 +22,9 @@ jobs:
       - name: Debug Environment Variables Before Upload
         run: |
           echo "🔍 Using BUCKET_NAME: $BUCKET_NAME"
+          echo "|$BUCKET_NAME|"
+
 
       - name: Upload DAGs to GCS (Use gcloud storage instead of gsutil)
         run: |
-          gcloud storage rsync --recursive airflow-local/dags gs://"${BUCKET_NAME}"/dags
+          gcloud storage rsync --recursive airflow-local/dags gs://${BUCKET_NAME}/dags
