@@ -18,4 +18,4 @@ jobs:
 
       - name: Upload DAGs to GCS
         run: |
-          gsutil -m rsync -r dags gs://$BUCKET_NAME/dags
+          gsutil -m rsync -r airflow-local/dags gs://$BUCKET_NAME/dags
