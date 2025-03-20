@@ -35,7 +35,7 @@ jobs:
       - name: Test GCS Access
         run: |
           echo "🔍 현재 계정으로 버킷 내부 파일 조회 테스트:"
-          gcloud storage ls gs://asia-northeast3-goorm-envir-f14a327b-bucket/
+          gcloud storage ls gs://asia-northeast3-goorm-envir-f14a327b-bucket/dags
 
       - name: Set up environment variables
         run: |
