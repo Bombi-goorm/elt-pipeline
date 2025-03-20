@@ -48,7 +48,7 @@ jobs:
           echo "🔍 GCS_BUCKET_NAME: ${{ vars.GCS_BUCKET_NAME }}"
       - name: Debug Environment Variables Before Upload
         run: |
-          🔍 Using BUCKET_NAME: asia-northeast3-goorm-envir-f14a327b-bucket
+          echo "🔍 Using BUCKET_NAME: $BUCKET_NAME"
 
 
       - name: Upload DAGs to GCS (Use gcloud storage instead of gsutil)
