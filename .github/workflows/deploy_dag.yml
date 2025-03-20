@@ -27,7 +27,7 @@ jobs:
       - name: Check GCS Bucket IAM Policy
         run: |
           echo "🔍 버킷 IAM 정책 확인:"
-          gcloud storage buckets gs://get-iam-policy asia-northeast3-goorm-envir-f14a327b-bucket
+          gcloud storage buckets get-iam-policy gs://asia-northeast3-goorm-envir-f14a327b-bucket
       - name: Check Current User GCS Permissions
         run: |
           echo "🔍 현재 인증된 계정이 GCS에서 어떤 권한을 가지고 있는지 확인:"
