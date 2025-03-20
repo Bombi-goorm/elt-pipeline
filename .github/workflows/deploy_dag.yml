@@ -9,8 +9,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - run: ls -al
-
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -23,4 +21,4 @@ jobs:
 
       - name: Upload DAGs to GCS
         run: |
-          gsutil -m rsync -r airflow-local/dags gs://$BUCKET_NAME/dags
+          gsutil -m rsync -r cdjsoifjoweifjioewjfowefj gs://$BUCKET_NAME/dags
