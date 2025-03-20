@@ -19,6 +19,11 @@ jobs:
           echo "🔍 GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}"
           echo "🔍 GCS_BUCKET_NAME: ${{ vars.GCS_BUCKET_NAME }}"
 
+      - name: Set up environment variables
+        run: |
+          echo "PROJECT_ID=${{ vars.GCP_PROJECT_ID }}" >> $GITHUB_ENV
+          echo "BUCKET_NAME=${{ vars.GCS_BUCKET_NAME }}" >> $GITHUB_ENV
+
       - name: Debug Environment Variables Before Upload
         run: |
           echo "🔍 Using BUCKET_NAME: $BUCKET_NAME"
