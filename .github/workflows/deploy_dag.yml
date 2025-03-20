@@ -1,6 +1,9 @@
 name: Deploy DAGs to Cloud Composer
 
-on: push
+on:
+  push:
+    paths:
+      - 'airflow/dags/**'
 
 jobs:
   deploy:
