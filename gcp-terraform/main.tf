@@ -72,10 +72,8 @@ resource "google_composer_environment" "goorm_environment" {
         "astronomer-cosmos" = ">=1.9"
       }
     }
-
     node_config {
       service_account = google_service_account.composer_sa.email
     }
-
   }
 }
