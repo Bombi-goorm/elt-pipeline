@@ -1,10 +1,7 @@
-from airflow.providers.google.cloud.operators.bigquery import BigQueryGetDataOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from airflow.providers.google.cloud.transfers.mysql_to_gcs import MySQLToGCSOperator
-from airflow.providers.mysql.hooks.mysql import MySqlHook
 from datetime import datetime
-from airflow.decorators import dag, task
-from airflow.datasets import DatasetAlias
+from airflow.decorators import dag
 
 dataset_alias = "kat_real_time_gcs"
 

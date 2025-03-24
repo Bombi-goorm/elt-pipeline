@@ -3,7 +3,6 @@ from airflow.decorators import dag, task
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.hooks.pubsub import PubSubHook
 import json
-import base64
 
 
 @dag(
