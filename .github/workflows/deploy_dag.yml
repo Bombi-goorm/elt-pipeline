@@ -22,6 +22,13 @@ jobs:
           echo "PROJECT_ID=${{ vars.GCP_PROJECT_ID }}" >> $GITHUB_ENV
           echo "BUCKET_NAME=${{ vars.GCS_BUCKET_NAME }}" >> $GITHUB_ENV
 
+      
+
       - name: Upload DAGs to GCS (Use gcloud storage instead of gsutil)
         run: |
           gcloud storage rsync airflow-local/dags gs://${BUCKET_NAME}/dags --recursive --delete-unmatched-destination-objects --checksums-only
+
+      - name: Compile dbt for making manifest file
+        run: |
+          cd airflow-local/dags/dbt && dbt compile
+          gcloud storage target/manifest.json gs://${BUCKET_NAME}/dags/target/manifest.json

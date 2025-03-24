@@ -6,7 +6,6 @@ import json
 
 
 @dag(
-    # schedule_interval="*/5 * * * *",
     start_date=datetime(2025, 2, 18),
     catchup=False,
 )
