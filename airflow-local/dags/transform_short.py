@@ -11,7 +11,7 @@ from airflow.decorators import dag, task
 from os import environ
 from airflow.datasets import Dataset
 
-DBT_PROJECT_PATH = f"{environ['AIRFLOW_HOME']}/dags/dbt"
+DBT_PROJECT_PATH = "/home/airflow/gcs/dags/dbt"
 short_dataset = Dataset("bigquery://bomnet.short")
 
 profile_config = ProfileConfig(
