@@ -1,14 +1,13 @@
-from airflow.decorators import dag
+from airflow.decorators import dag, task
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+from airflow.providers.http.sensors.http import HttpSensor
+from datetime import timedelta
 from pendulum import datetime
 
 from custom_operators.data_go_abc import PublicDataToGCSOperator
-from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
-from airflow.providers.http.sensors.http import HttpSensor
-from json import JSONDecodeError
-from airflow.exceptions import AirflowBadRequest
-import json
-from datetime import timedelta
-from requests import Response
+from helpers.common_utils import (datago_validate_api_response,
+                                  datago_safe_response_filter,
+                                  datago_paginate)
 
 
 @dag(
@@ -18,19 +17,6 @@ from requests import Response
     catchup=False,
 )
 def kat_sale_to_bigquery():
-    def validate_api_response(response) -> bool:
-        try:
-            json_data = response.json()
-        except JSONDecodeError:
-            raise AirflowBadRequest("API Response is not valid JSON")
-
-        header = json_data["response"]["header"]
-        if header["resultCode"] != "0":
-            raise AirflowBadRequest(f"Error {header["resultCode"]}: {header["resultMsg"]}")
-        total_count = json_data["response"]["body"]["totalCount"]
-        print(f"Total Count : {json_data["response"]}")
-        return False if total_count == 0 else True
-
     health_check_kat_sale = HttpSensor(
         task_id="health_check_kat_sale",
         http_conn_id="datago_connection",
@@ -43,40 +29,21 @@ def kat_sale_to_bigquery():
             "cond[trd_clcln_ymd::EQ]": "{{ yesterday_ds }}",
             "cond[whsl_mrkt_cd::EQ]": "110001"
         },
-        response_check=lambda response: validate_api_response(response),
+        response_check=lambda response: datago_validate_api_response(response),
         poke_interval=30,
         timeout=600,
         mode="poke",
     )
-
-    def safe_response_filter(responses: Response | list[Response]):
-        jsonl_str = ""
-        for res in responses:
-            if not res.text.strip():
-                raise ValueError("API returned an empty response")
-            content = res.json()
-            total_count = content["response"]["body"]["totalCount"]
-            item_list = content["response"]["body"]["items"]["item"]
-            jsonl_str = "\n".join([json.dumps(item, ensure_ascii=False) for item in item_list])
-            if total_count == 0:
-                return None
-        return jsonl_str
+    # TODO: .expand require list but @task's return value is xcom args when dag is parsed
+    # @task(task_id="get_wholesale_market_codes")
+    # def get_wholesale_market_codes() -> list[str]:
+    #     from airflow.models import Variable
+    #     return Variable.get("wholesale_market_codes")
 
     codes = ["210001", "210009", "380201", "370101", "320201", "320101", "320301", "110001", "110008",
              "310101", "310401", "310901", "311201", "230001", "230003", "360301", "240001", "240004", "350402",
              "350301", "350101", "250001", "250003", "330101", "340101", "330201", "370401", "371501", "220001",
              "380401", "380101", "380303"]
-
-    def paginate(response: Response) -> dict | None:
-        content = response.json()
-        if not content["response"].get("body"):
-            return None
-        body = content["response"]["body"]
-        total_count = body["totalCount"]
-        cur_page_no = body["pageNo"]
-        cur_num_of_rows = body["numOfRows"]
-        if cur_page_no * cur_num_of_rows < total_count:
-            return dict(params={"pageNo": cur_page_no + 1, })
 
     kat_sale_to_gcs = PublicDataToGCSOperator.partial(
         task_id="kat_sale_to_gcs",
@@ -90,8 +57,8 @@ def kat_sale_to_bigquery():
         },
         retries=2,
         retry_delay=timedelta(minutes=1),
-        response_filter=safe_response_filter,
-        pagination_function=paginate,
+        response_filter=datago_safe_response_filter,
+        pagination_function=datago_paginate,
         api_type=("query", "serviceKey")
     ).expand(
         expanded_data=[{"cond[whsl_mrkt_cd::EQ]": code} for code in codes]
