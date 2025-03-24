@@ -1,7 +1,7 @@
 from datetime import datetime
 from airflow.decorators import dag
 from airflow.datasets import DatasetAlias
-from plugins.custom_operators.data_go_abc import PublicDataToGCSOperator
+from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from helpers.common_utils import datago_safe_response_filter, datago_paginate
 
 realtime_alias = "kat_real_time_gcs"

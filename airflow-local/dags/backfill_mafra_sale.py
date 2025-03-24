@@ -2,7 +2,7 @@ from airflow.decorators import dag
 from pendulum import datetime
 # from cosmos import DbtDag, ProjectConfig, ProfileConfig, ExecutionConfig
 
-from plugins.custom_operators.data_go_abc import PublicDataToGCSOperator
+from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from airflow.providers.http.sensors.http import HttpSensor
 from json import JSONDecodeError
