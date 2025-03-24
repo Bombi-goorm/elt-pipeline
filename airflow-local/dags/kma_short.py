@@ -1,6 +1,6 @@
 from airflow.decorators import dag, task
 from pendulum import datetime
-from plugins.custom_operators.data_go_abc import PublicDataToGCSOperator
+from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from airflow.datasets import Dataset
 from helpers.common_utils import datago_safe_response_filter
