@@ -1,18 +1,16 @@
 from typing import Sequence
-from airflow.datasets import Dataset, DatasetAlias
-
+from airflow.datasets import Dataset
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.providers.http.hooks.http import HttpHook
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 # from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 from requests import Response
 from airflow.utils.context import Context
 from airflow.exceptions import AirflowSkipException
 
 
-# fds
 class PublicDataToGCSOperator(BaseOperator):
     template_fields: Sequence[str] = ("bucket_name", "object_name", "data")
 
@@ -97,7 +95,6 @@ class PublicDataToGCSOperator(BaseOperator):
         self.data[self.api_type[1]] = api_key
 
         response = http_hook.run(endpoint=self.endpoint, data=self.data, headers=self.headers)
-        self.log.debug("Sending '%s' to url: %s", self.method, self.endpoint)
 
         all_responses = self.paginate_sync(http_hook, response=response)
 

@@ -6,7 +6,6 @@ from airflow.datasets import DatasetAlias
 dataset_alias = "kat_real_time_gcs"
 
 
-# fdssfdsdf
 @dag(
     schedule=[DatasetAlias(dataset_alias)],
     start_date=datetime(2025, 2, 18),
