@@ -18,7 +18,6 @@ AUCTION_TABLE = Variable.get("AUCTION_TABLE")
 def gcs_to_bigquery_dag_backfill():
     @task
     def load_gcs_to_bq(**kwargs):
-        print(f"{kwargs["ds_nodash"]}.jsonl")
         GCSToBigQueryOperator(
             task_id="gcs_to_bigquery",
             gcp_conn_id="gcp-sample",
