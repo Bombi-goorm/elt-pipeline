@@ -4,7 +4,7 @@ from airflow.providers.http.sensors.http import HttpSensor
 from datetime import timedelta
 from pendulum import datetime
 
-from custom_operators.data_go_abc import PublicDataToGCSOperator
+from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from helpers.common_utils import (datago_validate_api_response,
                                   datago_safe_response_filter,
                                   datago_paginate)
