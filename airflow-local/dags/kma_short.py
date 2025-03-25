@@ -42,7 +42,7 @@ def extract_kma_short():
         bucket="bomnet-raw",
         source_objects=["kma/short/{{ ds_nodash }}/*.jsonl"],
         schema_object="schemas/kma_short_schema.json",
-        destination_project_dataset_table="{{ val.value.GCP_PROJECT_ID }}:{{ val.value.KMA_DATASET }}.{{ val.value.SHORT_TABLE }}",
+        destination_project_dataset_table="{{ var.value.GCP_PROJECT_ID }}:{{ var.value.KMA_DATASET }}.{{ var.value.SHORT_TABLE }}",
         write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,

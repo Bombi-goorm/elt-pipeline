@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow.decorators import dag
 from airflow.datasets import DatasetAlias
 from include.custom_operators.data_go_abc import PublicDataToGCSOperator
@@ -9,7 +9,7 @@ realtime_alias = "kat_real_time_gcs"
 
 
 @dag(
-    schedule_interval="@daily",
+    schedule_interval=timedelta(hours=2),
     start_date=datetime(2025, 2, 18),
     catchup=False,
 )

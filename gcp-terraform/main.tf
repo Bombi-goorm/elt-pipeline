@@ -65,6 +65,20 @@ resource "google_composer_environment" "goorm_environment" {
 
   config {
 
+    workloads_config {
+      scheduler {
+
+      }
+
+      worker {
+        min_count = 1
+        max_count = 5
+        cpu = 8
+        memory_gb = 16
+        storage_gb = 20
+      }
+    }
+
     software_config {
       image_version = "composer-3-airflow-2.10.2-build.11"
 
