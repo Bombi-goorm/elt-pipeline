@@ -1,12 +1,15 @@
+from airflow.datasets import DatasetAlias
 from pendulum import datetime
 from airflow.decorators import dag, task
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.hooks.pubsub import PubSubHook
 import json
 
+realtime_alias = "kat_real_time_gcs"
+
 
 @dag(
-    schedule_interval=None,
+    schedule=[DatasetAlias(realtime_alias)],
     start_date=datetime(2025, 2, 18),
     catchup=False,
 )
@@ -18,7 +21,8 @@ def publish_price():
             gcp_conn_id="gcp-sample",
             location="asia-northeast3",
         )
-        sql = "SELECT * FROM kma.int_aws__match_price_condition"
+        sql = ("SELECT  * "
+               "FROM    kma.int_aws__match_price_condition")
 
         records = hook.get_records(sql)
         if not records:

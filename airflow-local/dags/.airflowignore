@@ -1,2 +1,4 @@
 dev/
-dbt_project/*
+dbt/*
+include/
+helpers/
