@@ -31,9 +31,9 @@ def backfill_mafra_sale2():
 
         header = json_data["response"]["header"]
         if header["resultCode"] != "0":
-            raise AirflowBadRequest(f"Error {header["resultCode"]}: {header["resultMsg"]}")
+            raise AirflowBadRequest(f"Error {header['resultCode']}: {header['resultMsg']}")
         total_count = json_data["response"]["body"]["totalCount"]
-        print(f"Total Count : {json_data["response"]}")
+        print(f"Total Count : {json_data['response']}")
         return False if total_count == 0 else True
 
     def safe_response_filter(responses: Response | list[Response]):

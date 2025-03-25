@@ -30,22 +30,13 @@ def match_price_condition():
         gcp_conn_id="gcp-sample",
         source_objects=["aws_rds/price_conditions.csv"],
         bucket="bomnet-raw",
-        destination_project_dataset_table=f"{"goorm-bomnet"}:{"aws_rds"}.{"price_conditions"}",
+        destination_project_dataset_table="goorm-bomnet:aws_rds.price_conditions",
         # schema_object="schemas/kat_real_time_schema.json",
         write_disposition="WRITE_TRUNCATE",
         source_format="CSV",
         autodetect=True,
     )
 
-    # @task
-    # def fetch_data_from_mysql():
-    #     mysql_hook = MySqlHook(mysql_conn_id="mysql_test_connection")
-    #     sql = "SELECT * FROM notification_condition;"
-    #     records = mysql_hook.get_records(sql)
-    #     for record in records:
-    #         print(record)
-
-    # fetch_data_from_mysql()
     from_mysql_to_gcs >> gcs_to_bq
 
 

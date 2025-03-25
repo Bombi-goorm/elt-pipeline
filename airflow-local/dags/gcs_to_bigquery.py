@@ -18,7 +18,7 @@ def gcs_to_bigquery():
         gcp_conn_id="gcp-sample",
         bucket="bomnet-raw",
         source_objects=["mafra/real_time/{{ ds_nodash }}.jsonl"],
-        destination_project_dataset_table=f"{"goorm-bomnet"}:{"mafra"}.{"real_time"}",
+        destination_project_dataset_table="goorm-bomnet:mafra.real_time",
         schema_object="schemas/kat_real_time_schema.json",
         write_disposition="WRITE_APPEND",
         source_format="NEWLINE_DELIMITED_JSON",
