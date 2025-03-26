@@ -12,7 +12,7 @@ from os import environ
 from airflow.datasets import Dataset
 
 DBT_PROJECT_PATH = "/home/airflow/gcs/dags/dbt"
-sale_dataset = Dataset("bigquery://bomnet.realtime")
+sale_dataset = Dataset("bigquery://bomnet.sale")
 
 profile_config = ProfileConfig(
     profile_name="bigquery-db",
@@ -38,8 +38,8 @@ def transform_kma_sale():
         bash_command="echo hello",
         outlets=[dbt_realtime]
     )
-    transform_realtime = DbtTaskGroup(
-        group_id="transform_realtime",
+    transform_sale = DbtTaskGroup(
+        group_id="transform_sale",
         project_config=ProjectConfig(
             dbt_project_path=DBT_PROJECT_PATH,
             manifest_path=DBT_PROJECT_PATH + "/target/manifest.json",
@@ -59,7 +59,7 @@ def transform_kma_sale():
         }
     )
 
-    start_task >> transform_realtime >> end_task
+    start_task >> transform_sale >> end_task
 
 
 transform_kma_sale()
