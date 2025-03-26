@@ -31,7 +31,7 @@ dbt_realtime = Dataset("bigquery://bomnet.transform.realtime")
     schedule=[sale_dataset],
     catchup=False,
 )
-def transform_kma_realtime():
+def transform_kma_sale():
     start_task = EmptyOperator(task_id="start-venv-examples")
     end_task = BashOperator(
         task_id="end-venv-examples",
@@ -62,4 +62,4 @@ def transform_kma_realtime():
     start_task >> transform_realtime >> end_task
 
 
-transform_kma_realtime()
+transform_kma_sale()

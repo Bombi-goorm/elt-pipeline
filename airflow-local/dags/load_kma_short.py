@@ -51,5 +51,5 @@ def load_kma_short():
 
     extract_kma_short_data >> load_gcs_to_bq
 
-
+    
 load_kma_short()
