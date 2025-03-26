@@ -1,5 +1,6 @@
 from airflow.decorators import dag, task
 from pendulum import datetime
+from datetime import timedelta
 from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from airflow.datasets import Dataset
@@ -46,10 +47,12 @@ def load_kma_short():
         write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
-        outlets=[short_dataset]
+        outlets=[short_dataset],
+        retries=2,
+        retry_delay=timedelta(minutes=1),
     )
 
     extract_kma_short_data >> load_gcs_to_bq
 
-    
+
 load_kma_short()
