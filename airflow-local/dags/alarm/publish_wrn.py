@@ -1,12 +1,16 @@
+from airflow import Dataset
 from pendulum import datetime
 from airflow.decorators import dag, task
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.hooks.pubsub import PubSubHook
 import json
 
+dbt_wrn = Dataset("bigquery://bomnet.transform.wrn")
+
 
 @dag(
     start_date=datetime(2025, 2, 18),
+    schedule=[dbt_wrn],
     catchup=False,
 )
 def publish_wrn():

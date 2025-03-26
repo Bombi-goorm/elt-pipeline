@@ -2,3 +2,5 @@ dev/
 dbt/*
 include/
 helpers/
+kat_realtime_to_gcs.py
+kma_short_to_gcs.py

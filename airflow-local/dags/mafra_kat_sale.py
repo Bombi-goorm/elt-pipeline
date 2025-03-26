@@ -1,3 +1,4 @@
+from airflow import Dataset
 from airflow.decorators import dag, task
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from airflow.providers.http.sensors.http import HttpSensor
@@ -8,6 +9,8 @@ from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from helpers.common_utils import (datago_validate_api_response,
                                   datago_safe_response_filter,
                                   datago_paginate)
+
+sale_dataset = Dataset("bigquery://bomnet.sale")
 
 
 @dag(
@@ -77,6 +80,7 @@ def kat_sale_to_bigquery():
         write_disposition="WRITE_APPEND",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
+        outlets=[sale_dataset]
     )
 
     health_check_kat_sale >> kat_sale_to_gcs >> load_gcs_to_bq

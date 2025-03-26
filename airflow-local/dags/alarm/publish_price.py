@@ -1,15 +1,15 @@
-from airflow.datasets import DatasetAlias
+from airflow.datasets import Dataset
 from pendulum import datetime
 from airflow.decorators import dag, task
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.hooks.pubsub import PubSubHook
 import json
 
-realtime_alias = "kat_real_time_gcs"
+dbt_realtime = Dataset("bigquery://bomnet.transform.realtime")
 
 
 @dag(
-    schedule=[DatasetAlias(realtime_alias)],
+    schedule=[dbt_realtime],
     start_date=datetime(2025, 2, 18),
     catchup=False,
 )
@@ -17,7 +17,6 @@ def publish_price():
     @task(task_id="fetch_bigquery_data")
     def fetch_bigquery_data():
         hook = BigQueryHook(
-            task_id="fetch_bigquery_data",
             gcp_conn_id="gcp-sample",
             location="asia-northeast3",
         )
