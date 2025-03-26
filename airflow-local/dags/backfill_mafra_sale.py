@@ -1,10 +1,7 @@
 from airflow.decorators import dag
 from pendulum import datetime
-# from cosmos import DbtDag, ProjectConfig, ProfileConfig, ExecutionConfig
-
 from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
-from airflow.providers.http.sensors.http import HttpSensor
 from json import JSONDecodeError
 from airflow.exceptions import AirflowBadRequest
 import json
@@ -12,15 +9,13 @@ from datetime import timedelta
 from requests import Response
 
 
-# DbtDag
-
-# fdsfsd
 @dag(
     schedule_interval="@daily",
     start_date=datetime(2025, 3, 18),
     end_date=datetime(2025, 3, 19),
     render_template_as_native_obj=True,
     catchup=True,
+    is_paused_upon_creation=True,
 )
 def backfill_mafra_sale2():
     def validate_api_response(response) -> bool:

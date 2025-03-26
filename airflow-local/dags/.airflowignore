@@ -1,2 +1,7 @@
 dev/
-dbt_project/*
+dbt/*
+include/
+helpers/
+kat_realtime_to_gcs.py
+kma_short_to_gcs.py
+gcs_to_bigquery.py

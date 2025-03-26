@@ -3,6 +3,38 @@ from typing import Optional, List, Union
 import json
 from json import JSONDecodeError
 from airflow.exceptions import AirflowBadRequest
+import time
+import logging
+import sys
+import functools
+import json
+
+
+def ensure_log_flush(func):
+    """
+    Decorator to guarantee log flushing and basic execution logging.
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        task_id = kwargs.get('task_id', func.__name__)
+        logging.info(f"[{task_id}] Start - args: {args} kwargs: {json.dumps(kwargs, default=str)}")
+        sys.stdout.flush()
+
+        start = time.time()
+        try:
+            result = func(*args, **kwargs)
+            duration = round(time.time() - start, 3)
+            logging.info(f"[{task_id}] Success in {duration}s")
+            return result
+        except Exception as e:
+            logging.exception(f"[{task_id}] Failed with error: {e}")
+            raise
+        finally:
+            sys.stdout.flush()
+            time.sleep(1)  # Let logs propagate
+
+    return wrapper
 
 
 def datago_validate_api_response(response: Response) -> bool:

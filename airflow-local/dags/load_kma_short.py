@@ -1,5 +1,6 @@
 from airflow.decorators import dag, task
 from pendulum import datetime
+from datetime import timedelta
 from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from airflow.datasets import Dataset
@@ -12,7 +13,7 @@ from helpers.common_utils import datago_safe_response_filter
     render_template_as_native_obj=True,
     catchup=False,
 )
-def extract_kma_short():
+def load_kma_short():
     @task
     def get_region_coords_variable() -> list[dict[str, int]]:
         from airflow.models import Variable
@@ -42,14 +43,16 @@ def extract_kma_short():
         bucket="bomnet-raw",
         source_objects=["kma/short/{{ ds_nodash }}/*.jsonl"],
         schema_object="schemas/kma_short_schema.json",
-        destination_project_dataset_table="{{ val.value.GCP_PROJECT_ID }}:{{ val.value.KMA_DATASET }}.{{ val.value.SHORT_TABLE }}",
+        destination_project_dataset_table="{{ var.value.GCP_PROJECT_ID }}:{{ var.value.KMA_DATASET }}.{{ var.value.SHORT_TABLE }}",
         write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
-        outlets=[short_dataset]
+        outlets=[short_dataset],
+        retries=2,
+        retry_delay=timedelta(minutes=1),
     )
 
     extract_kma_short_data >> load_gcs_to_bq
 
 
-extract_kma_short()
+load_kma_short()

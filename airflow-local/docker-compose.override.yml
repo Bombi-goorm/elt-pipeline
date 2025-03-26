@@ -2,12 +2,10 @@ version: '3'
 services:
   airflow-scheduler:
     environment:
-      - AIRFLOW__CORE__LOGGING_LEVEL=DEBUG
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
 
   airflow-webserver:
     environment:
-      - AIRFLOW__CORE__LOGGING_LEVEL=DEBUG
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
 
   airflow-worker:

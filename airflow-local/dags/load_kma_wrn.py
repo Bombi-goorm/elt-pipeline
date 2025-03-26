@@ -1,9 +1,12 @@
+from airflow import Dataset
 from airflow.decorators import dag
 from airflow.models import Variable
 from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from datetime import datetime, timedelta
 from helpers.common_utils import datago_safe_response_filter, datago_paginate
+
+wrn_dataset = Dataset("bigquery://bomnet.wrn")
 
 
 @dag(
@@ -12,7 +15,7 @@ from helpers.common_utils import datago_safe_response_filter, datago_paginate
     render_template_as_native_obj=True,
     catchup=False,
 )
-def kma_wrn_to_bigquery():
+def load_kma_wrn():
     kma_wrn_to_gcs = PublicDataToGCSOperator(
         task_id="extract_kma_wrn",
         bucket_name="bomnet-raw",
@@ -41,9 +44,10 @@ def kma_wrn_to_bigquery():
         write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
+        outlets=[wrn_dataset],
     )
 
     kma_wrn_to_gcs >> load_gcs_to_bq
 
 
-kma_wrn_to_bigquery()
+load_kma_wrn()

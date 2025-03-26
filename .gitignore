@@ -78,7 +78,13 @@ terraform.tfstate.backup
 
 .terraform/
 .terraform.lock.hcl
-
+.terraform.tfstate.lock.info
 terraform.tfvars
 *.tfvars
 crash.log
+
+
+# local dev
+
+connections.json
+variables.json
