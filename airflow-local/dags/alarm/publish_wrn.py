@@ -17,7 +17,6 @@ def publish_wrn():
     @task(task_id="fetch_bigquery_data")
     def fetch_bigquery_data():
         hook = BigQueryHook(
-            task_id="fetch_bigquery_data",
             gcp_conn_id="gcp-sample",
             location="asia-northeast3",
         )
