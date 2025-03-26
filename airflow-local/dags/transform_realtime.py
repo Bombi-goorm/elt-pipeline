@@ -28,7 +28,7 @@ rds_dataset = Dataset("bigquery://bomnet.rds.conditions")
 
 @dag(
     start_date=datetime(2024, 2, 18),
-    schedule=[realtime_dataset | rds_dataset],
+    schedule=(realtime_dataset | rds_dataset),
     catchup=False,
 )
 def transform_kma_realtime():
