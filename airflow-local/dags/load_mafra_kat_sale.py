@@ -19,7 +19,7 @@ sale_dataset = Dataset("bigquery://bomnet.sale")
     render_template_as_native_obj=True,
     catchup=False,
 )
-def kat_sale_to_bigquery():
+def load_mafra_kat_sale():
     health_check_kat_sale = HttpSensor(
         task_id="health_check_kat_sale",
         http_conn_id="datago_connection",
@@ -86,4 +86,4 @@ def kat_sale_to_bigquery():
     health_check_kat_sale >> kat_sale_to_gcs >> load_gcs_to_bq
 
 
-kat_sale_to_bigquery()
+load_mafra_kat_sale()

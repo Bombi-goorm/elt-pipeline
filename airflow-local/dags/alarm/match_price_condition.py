@@ -1,9 +1,10 @@
+from airflow import Dataset
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from airflow.providers.google.cloud.transfers.mysql_to_gcs import MySQLToGCSOperator
 from datetime import datetime
 from airflow.decorators import dag
 
-dataset_alias = "kat_real_time_gcs"
+realtime_dataset = Dataset("bigquery://bomnet.realtime")
 
 
 @dag(
@@ -23,6 +24,7 @@ def match_price_condition():
         field_delimiter=",",
         mysql_conn_id="mysql_test_connection",
         gcp_conn_id="gcp-sample",
+        outlets=[realtime_dataset]
     )
 
     gcs_to_bq = GCSToBigQueryOperator(

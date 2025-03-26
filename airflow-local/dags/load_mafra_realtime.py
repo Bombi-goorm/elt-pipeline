@@ -11,7 +11,7 @@ from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQue
     start_date=datetime(2025, 2, 18),
     catchup=False,
 )
-def kat_realtime():
+def load_mafra_realtime():
     real_time_to_gcs = PublicDataToGCSOperator(
         task_id="real_time_to_gcs",
         bucket_name="bomnet-raw",
@@ -42,4 +42,4 @@ def kat_realtime():
     real_time_to_gcs >> load_gcs_to_bq
 
 
-kat_realtime()
+load_mafra_realtime()

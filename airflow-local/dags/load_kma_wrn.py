@@ -15,7 +15,7 @@ wrn_dataset = Dataset("bigquery://bomnet.wrn")
     render_template_as_native_obj=True,
     catchup=False,
 )
-def kma_wrn_to_bigquery():
+def load_kma_wrn():
     kma_wrn_to_gcs = PublicDataToGCSOperator(
         task_id="extract_kma_wrn",
         bucket_name="bomnet-raw",
@@ -50,4 +50,4 @@ def kma_wrn_to_bigquery():
     kma_wrn_to_gcs >> load_gcs_to_bq
 
 
-kma_wrn_to_bigquery()
+load_kma_wrn()

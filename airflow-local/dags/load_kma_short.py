@@ -12,7 +12,7 @@ from helpers.common_utils import datago_safe_response_filter
     render_template_as_native_obj=True,
     catchup=False,
 )
-def extract_kma_short():
+def load_kma_short():
     @task
     def get_region_coords_variable() -> list[dict[str, int]]:
         from airflow.models import Variable
@@ -52,4 +52,4 @@ def extract_kma_short():
     extract_kma_short_data >> load_gcs_to_bq
 
 
-extract_kma_short()
+load_kma_short()
