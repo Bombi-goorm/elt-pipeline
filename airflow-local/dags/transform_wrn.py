@@ -51,7 +51,7 @@ def transform_kma_wrn():
         ),
         operator_args={
             "py_system_site_packages": False,
-            "py_requirements": ["dbt-bigquery"],  # 또는 사용하는 adapter에 맞춰 변경
+            "py_requirements": ["dbt-bigquery"],
             "install_deps": True
         }
     )

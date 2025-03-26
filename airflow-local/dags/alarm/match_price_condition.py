@@ -6,11 +6,9 @@ from airflow.decorators import dag
 
 realtime_dataset = Dataset("bigquery://bomnet.realtime")
 
-dbt_realtime = Dataset("bigquery://bomnet.transform.realtime")
-
 
 @dag(
-    schedule=[dbt_realtime],
+    schedule=[realtime_dataset],
     start_date=datetime(2025, 2, 18),
     render_template_as_native_obj=True,
     catchup=False,
@@ -29,6 +27,7 @@ def match_price_condition():
         outlets=[realtime_dataset]
     )
 
+    rds_dataset = Dataset("bigquery://bomnet.rds.conditions")
     gcs_to_bq = GCSToBigQueryOperator(
         task_id="gcs_to_bq",
         gcp_conn_id="gcp-sample",
@@ -39,6 +38,7 @@ def match_price_condition():
         write_disposition="WRITE_TRUNCATE",
         source_format="CSV",
         autodetect=True,
+        outlets=[rds_dataset]
     )
 
     from_mysql_to_gcs >> gcs_to_bq
