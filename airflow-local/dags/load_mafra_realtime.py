@@ -7,7 +7,7 @@ from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQue
 
 
 @dag(
-    schedule_interval=timedelta(hours=2),
+    schedule_interval='*/10 * * * *',
     start_date=datetime(2025, 2, 18),
     catchup=False,
 )
