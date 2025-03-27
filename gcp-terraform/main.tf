@@ -73,9 +73,9 @@ resource "google_composer_environment" "goorm_environment" {
       worker {
         min_count = 1
         max_count = 4
-        cpu = 2
+        cpu = 4
         memory_gb = 16
-        storage_gb = 4
+        storage_gb = 1
       }
     }
 

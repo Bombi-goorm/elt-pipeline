@@ -7,7 +7,7 @@ from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQue
 
 
 @dag(
-    schedule_interval='*/50 * * * *',
+    schedule_interval='0 * * * *',
     start_date=datetime(2025, 2, 18),
     catchup=False,
 )
@@ -36,7 +36,7 @@ def load_mafra_realtime():
                                           "{{ var.value.mafra_dataset }}."
                                           "{{ var.value.kat_realtime_table }}",
         schema_object="schemas/kat_real_time_schema.json",
-        write_disposition="WRITE_APPEND",
+        write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
         outlets=[realtime_dataset],
