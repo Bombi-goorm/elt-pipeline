@@ -34,6 +34,8 @@ def load_kma_short():
         },
         api_type=("query", "serviceKey"),
         response_filter=datago_safe_response_filter,
+        retries=2,
+        retry_delay=timedelta(minutes=1),
     ).expand(expanded_data=region_coords)
 
     short_dataset = Dataset("bigquery://bomnet.short")
