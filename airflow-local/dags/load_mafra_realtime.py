@@ -33,8 +33,8 @@ def load_mafra_realtime():
         bucket="bomnet-raw",
         source_objects=["mafra/real_time/{{ ds_nodash }}.jsonl"],
         destination_project_dataset_table="{{ var.value.gcp_project_id }}:"
-                                          "{{ val.value.mafra_dataset }}."
-                                          "{{ val.value.kat_realtime_table }}",
+                                          "{{ var.value.mafra_dataset }}."
+                                          "{{ var.value.kat_realtime_table }}",
         schema_object="schemas/kat_real_time_schema.json",
         write_disposition="WRITE_APPEND",
         source_format="NEWLINE_DELIMITED_JSON",

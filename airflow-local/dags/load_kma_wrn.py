@@ -35,8 +35,8 @@ def load_kma_wrn():
         bucket="bomnet-raw",
         source_objects=["kma/wrn/{{ ds_nodash }}.jsonl"],
         destination_project_dataset_table="{{ var.value.gcp_project_id }}:"
-                                          "{{ val.value.kma_dataset }}."
-                                          "{{ val.value.wrn_table }}",
+                                          "{{ var.value.kma_dataset }}."
+                                          "{{ var.value.wrn_table }}",
         schema_object="schemas/kma_wrn_schema.json",
         write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",

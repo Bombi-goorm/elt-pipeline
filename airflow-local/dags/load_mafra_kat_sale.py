@@ -74,8 +74,8 @@ def load_mafra_kat_sale():
         bucket="{{ var.value.gcs_raw_bucket }}",
         source_objects=["mafra/kat_sale/{{ yesterday_ds }}/*.jsonl"],
         destination_project_dataset_table="{{ var.value.gcp_project_id }}:"
-                                          "{{ val.value.mafra_dataset }}."
-                                          "{{ val.value.kat_sale_table }}",
+                                          "{{ var.value.mafra_dataset }}."
+                                          "{{ var.value.kat_sale_table }}",
         schema_object="schemas/mafra__kat_sale_schema.json",
         write_disposition="WRITE_APPEND",
         source_format="NEWLINE_DELIMITED_JSON",
