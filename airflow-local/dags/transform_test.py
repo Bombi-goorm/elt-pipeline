@@ -1,18 +1,18 @@
 from datetime import datetime
-from cosmos.constants import LoadMode
 
 from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
-from cosmos import DbtTaskGroup
-from cosmos.constants import ExecutionMode
-from cosmos.config import ProfileConfig, ProjectConfig, ExecutionConfig, RenderConfig
-from cosmos.profiles import GoogleCloudServiceAccountDictProfileMapping
 from airflow.decorators import dag, task
 from airflow.datasets import Dataset
 
+from cosmos import DbtDag, DbtTaskGroup
+from cosmos.constants import ExecutionMode, LoadMode
+from cosmos.config import ProfileConfig, ProjectConfig, ExecutionConfig, RenderConfig
+from cosmos.profiles import GoogleCloudServiceAccountDictProfileMapping
+
 DBT_PROJECT_PATH = "/home/airflow/gcs/dags/dbt"
-wrn_dataset = Dataset("bigquery://bomnet.wrn")
-dbt_wrn = Dataset("bigquery://bomnet.transform.wrn")
+short_dataset = Dataset("bigquery://bomnet.short")
+
 profile_config = ProfileConfig(
     profile_name="bigquery-db",
     target_name="dev",
@@ -25,28 +25,27 @@ profile_config = ProfileConfig(
 
 @dag(
     start_date=datetime(2024, 2, 18),
-    schedule=[wrn_dataset],
+    schedule=[short_dataset],
     catchup=False,
 )
-def transform_kma_wrn():
+def test119():
     start_task = EmptyOperator(task_id="start-venv-examples")
     end_task = BashOperator(
         task_id="end-venv-examples",
-        bash_command="echo hello",
-        outlets=[dbt_wrn]
+        bash_command="cd /home/airflow/gcs/dags/dbt && dbt compile",
     )
-    transform_wrn = DbtTaskGroup(
-        group_id="transform_wrn",
+    test_transform = DbtTaskGroup(
+        group_id="test_transform",
         project_config=ProjectConfig(
             dbt_project_path=DBT_PROJECT_PATH,
             manifest_path=DBT_PROJECT_PATH + "/target/manifest.json",
         ),
         profile_config=profile_config,
         execution_config=ExecutionConfig(
-            execution_mode=ExecutionMode.VIRTUALENV
+            execution_mode=ExecutionMode.VIRTUALENV,
         ),
         render_config=RenderConfig(
-            select=["stg_kma__wrn+"],
+            # select=["stg_kma__short+"],
             load_method=LoadMode.DBT_MANIFEST
         ),
         operator_args={
@@ -56,7 +55,7 @@ def transform_kma_wrn():
         }
     )
 
-    start_task >> transform_wrn >> end_task
+    start_task >> test_transform >> end_task
 
 
-transform_kma_wrn()
+test119()
