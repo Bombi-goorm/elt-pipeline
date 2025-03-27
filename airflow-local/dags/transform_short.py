@@ -1,15 +1,14 @@
 from datetime import datetime
-from cosmos.constants import LoadMode
 
 from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
+from airflow.decorators import dag, task
+from airflow.datasets import Dataset
+
 from cosmos import DbtDag, DbtTaskGroup
-from cosmos.constants import ExecutionMode
+from cosmos.constants import ExecutionMode, LoadMode
 from cosmos.config import ProfileConfig, ProjectConfig, ExecutionConfig, RenderConfig
 from cosmos.profiles import GoogleCloudServiceAccountDictProfileMapping
-from airflow.decorators import dag, task
-from os import environ
-from airflow.datasets import Dataset
 
 DBT_PROJECT_PATH = "/home/airflow/gcs/dags/dbt"
 short_dataset = Dataset("bigquery://bomnet.short")
@@ -18,7 +17,7 @@ profile_config = ProfileConfig(
     profile_name="bigquery-db",
     target_name="dev",
     profile_mapping=GoogleCloudServiceAccountDictProfileMapping(
-        conn_id="gcp-sample",
+        conn_id="google_cloud_bomnet_conn",
         profile_args={"project": "goorm-bomnet", "dataset": "kma"}
     ),
 )

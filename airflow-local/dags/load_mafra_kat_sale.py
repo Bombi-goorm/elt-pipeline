@@ -70,12 +70,12 @@ def load_mafra_kat_sale():
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
         trigger_rule='none_failed',
-        gcp_conn_id="gcp-sample",
+        gcp_conn_id="google_cloud_bomnet_conn",
         bucket="{{ var.value.gcs_raw_bucket }}",
         source_objects=["mafra/kat_sale/{{ yesterday_ds }}/*.jsonl"],
-        destination_project_dataset_table="{{ var.value.GCP_PROJECT_ID }}:"
-                                          "mafra."
-                                          "kat_sale",
+        destination_project_dataset_table="{{ var.value.gcp_project_id }}:"
+                                          "{{ val.value.mafra_dataset }}."
+                                          "{{ val.value.kat_sale_table }}",
         schema_object="schemas/mafra__kat_sale_schema.json",
         write_disposition="WRITE_APPEND",
         source_format="NEWLINE_DELIMITED_JSON",

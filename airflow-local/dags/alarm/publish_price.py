@@ -17,7 +17,7 @@ def publish_price():
     @task(task_id="fetch_bigquery_data")
     def fetch_bigquery_data():
         hook = BigQueryHook(
-            gcp_conn_id="gcp-sample",
+            gcp_conn_id="google_cloud_bomnet_conn",
             location="asia-northeast3",
         )
         sql = ("SELECT  * "
@@ -43,7 +43,7 @@ def publish_price():
         if not messages:
             return "No new messages to publish"
 
-        pubsub_hook = PubSubHook(gcp_conn_id="gcp-sample")
+        pubsub_hook = PubSubHook(gcp_conn_id="google_cloud_bomnet_conn")
         topic = "bomnet-test"
         pubsub_messages = [
             {"data": json.dumps(msg, ensure_ascii=False).encode("utf-8")}

@@ -39,11 +39,13 @@ def load_kma_short():
     short_dataset = Dataset("bigquery://bomnet.short")
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
-        gcp_conn_id="gcp-sample",
+        gcp_conn_id="google_cloud_bomnet_conn",
         bucket="bomnet-raw",
         source_objects=["kma/short/{{ ds_nodash }}/*.jsonl"],
         schema_object="schemas/kma_short_schema.json",
-        destination_project_dataset_table="{{ var.value.GCP_PROJECT_ID }}:{{ var.value.KMA_DATASET }}.{{ var.value.SHORT_TABLE }}",
+        destination_project_dataset_table="{{ var.value.gcp_project_id }}:"
+                                          "{{ var.value.kma_dataset }}."
+                                          "{{ var.value.short_table }}",
         write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,

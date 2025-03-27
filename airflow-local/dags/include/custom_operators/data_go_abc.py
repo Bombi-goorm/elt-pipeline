@@ -27,7 +27,7 @@ class PublicDataToGCSOperator(BaseOperator):
                  response_filter: Callable[..., Any] | None = None,
                  api_type=None,
                  http_conn_id: str = "datago_connection",
-                 gcp_conn_id: str = "gcp-sample",
+                 gcp_conn_id: str = "google_cloud_bomnet_conn",
                  mime_type: str = "application/json",
                  alias_name: str = None,
                  *args, **kwargs):

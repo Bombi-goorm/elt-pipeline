@@ -17,7 +17,7 @@ profile_config = ProfileConfig(
     profile_name="bigquery-db",
     target_name="dev",
     profile_mapping=GoogleCloudServiceAccountDictProfileMapping(
-        conn_id="gcp-sample",
+        conn_id="google_cloud_bomnet_conn",
         profile_args={"project": "goorm-bomnet", "dataset": "kma"}
     ),
 )

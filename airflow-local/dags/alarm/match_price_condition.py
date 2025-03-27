@@ -23,14 +23,14 @@ def match_price_condition():
         export_format="csv",
         field_delimiter=",",
         mysql_conn_id="mysql_test_connection",
-        gcp_conn_id="gcp-sample",
+        gcp_conn_id="google_cloud_bomnet_conn",
         outlets=[realtime_dataset]
     )
 
     rds_dataset = Dataset("bigquery://bomnet.rds.conditions")
     gcs_to_bq = GCSToBigQueryOperator(
         task_id="gcs_to_bq",
-        gcp_conn_id="gcp-sample",
+        gcp_conn_id="google_cloud_bomnet_conn",
         source_objects=["aws_rds/price_conditions.csv"],
         bucket="bomnet-raw",
         destination_project_dataset_table="goorm-bomnet:aws_rds.price_conditions",

@@ -29,10 +29,12 @@ def load_mafra_realtime():
     realtime_dataset = Dataset("bigquery://bomnet.realtime")
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
-        gcp_conn_id="gcp-sample",
+        gcp_conn_id="google_cloud_bomnet_conn",
         bucket="bomnet-raw",
         source_objects=["mafra/real_time/{{ ds_nodash }}.jsonl"],
-        destination_project_dataset_table="goorm-bomnet:mafra.real_time",
+        destination_project_dataset_table="{{ var.value.gcp_project_id }}:"
+                                          "{{ val.value.mafra_dataset }}."
+                                          "{{ val.value.kat_realtime_table }}",
         schema_object="schemas/kat_real_time_schema.json",
         write_disposition="WRITE_APPEND",
         source_format="NEWLINE_DELIMITED_JSON",
