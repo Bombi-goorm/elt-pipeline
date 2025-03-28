@@ -15,34 +15,11 @@ sale_dataset = Dataset("bigquery://bomnet.sale")
 
 @dag(
     schedule_interval="@daily",
-    start_date=datetime(2020, 11, 22),
+    start_date=datetime(2021, 6, 24),
     render_template_as_native_obj=True,
     catchup=True,
 )
 def backfill_load_mafra_kat_sale():
-    # health_check_kat_sale = HttpSensor(
-    #     task_id="health_check_kat_sale",
-    #     http_conn_id="datago_connection",
-    #     endpoint="B552845/katSale/trades",
-    #     method="GET",
-    #     request_params={
-    #         "serviceKey": "{{ conn.datago_connection.extra_dejson.api_key }}",
-    #         "pageNo": "1",
-    #         "numOfRows": "1",
-    #         "cond[trd_clcln_ymd::EQ]": "{{ yesterday_ds }}",
-    #         "cond[whsl_mrkt_cd::EQ]": "110001"
-    #     },
-    #     response_check=lambda response: datago_validate_api_response(response),
-    #     poke_interval=30,
-    #     timeout=600,
-    #     mode="poke",
-    # )
-    # TODO: .expand require list but @task's return value is xcom args when dag is parsed
-    # @task(task_id="get_wholesale_market_codes")
-    # def get_wholesale_market_codes() -> list[str]:
-    #     from airflow.models import Variable
-    #     return Variable.get("wholesale_market_codes")
-
     codes = ["210001", "210009", "380201", "370101", "320201", "320101", "320301", "110001", "110008",
              "310101", "310401", "310901", "311201", "230001", "230003", "360301", "240001", "240004", "350402",
              "350301", "350101", "250001", "250003", "330101", "340101", "330201", "370401", "371501", "220001",

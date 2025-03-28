@@ -1,3 +1,4 @@
+{{ config(materialized='ephemeral') }}
 with sale as (
     select
                 date_time,
