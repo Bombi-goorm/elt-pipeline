@@ -15,7 +15,7 @@ sale_dataset = Dataset("bigquery://bomnet.sale")
 
 @dag(
     schedule_interval="@daily",
-    start_date=datetime(2021, 6, 24),
+    start_date=datetime(2022, 9, 16),
     render_template_as_native_obj=True,
     catchup=True,
 )
