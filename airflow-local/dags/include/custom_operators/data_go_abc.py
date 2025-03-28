@@ -5,7 +5,6 @@ from airflow.models import BaseOperator
 from airflow.providers.http.hooks.http import HttpHook
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from typing import Any, Callable
-# from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 from requests import Response
 from airflow.utils.context import Context
 from airflow.exceptions import AirflowSkipException
@@ -117,14 +116,6 @@ class PublicDataToGCSOperator(BaseOperator):
         return all_responses
 
     def _merge_next_page_parameters(self, next_page_params: dict) -> dict:
-        """
-        Merge initial request parameters with next page parameters.
-
-        For GET requests, query parameters (`params`) are merged instead of a request body (`data`).
-
-        :param next_page_params: A dictionary containing the parameters for the next page.
-        :return: A dictionary containing the merged parameters.
-        """
         return dict(
             endpoint=next_page_params.get("endpoint") or self.endpoint,
             data={**self.data, **next_page_params.get("params", {})},
