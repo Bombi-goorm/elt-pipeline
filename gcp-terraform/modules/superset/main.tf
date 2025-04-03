@@ -30,7 +30,7 @@ resource "google_compute_instance" "vm" {
   name         = "superset-vm"
   machine_type = "e2-standard-2"
   project      = var.project_id
-
+  zone =""
   tags = ["superset-node"]
 
   boot_disk {
