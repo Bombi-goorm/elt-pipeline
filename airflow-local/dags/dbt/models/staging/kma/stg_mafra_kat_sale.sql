@@ -1,5 +1,5 @@
 with source as (
-    select *
+    select distinct *
     from {{ source('mafra', 'kat_sale') }}
 ),
 

@@ -6,11 +6,9 @@ from airflow.decorators import dag
 
 realtime_dataset = Dataset("bigquery://bomnet.realtime")
 
-dbt_realtime = Dataset("bigquery://bomnet.transform.realtime")
-
 
 @dag(
-    schedule=[dbt_realtime],
+    schedule=[realtime_dataset],
     start_date=datetime(2025, 2, 18),
     render_template_as_native_obj=True,
     catchup=False,
@@ -25,13 +23,14 @@ def match_price_condition():
         export_format="csv",
         field_delimiter=",",
         mysql_conn_id="mysql_test_connection",
-        gcp_conn_id="gcp-sample",
+        gcp_conn_id="google_cloud_bomnet_conn",
         outlets=[realtime_dataset]
     )
 
+    rds_dataset = Dataset("bigquery://bomnet.rds.conditions")
     gcs_to_bq = GCSToBigQueryOperator(
         task_id="gcs_to_bq",
-        gcp_conn_id="gcp-sample",
+        gcp_conn_id="google_cloud_bomnet_conn",
         source_objects=["aws_rds/price_conditions.csv"],
         bucket="bomnet-raw",
         destination_project_dataset_table="goorm-bomnet:aws_rds.price_conditions",
@@ -39,6 +38,7 @@ def match_price_condition():
         write_disposition="WRITE_TRUNCATE",
         source_format="CSV",
         autodetect=True,
+        outlets=[rds_dataset]
     )
 
     from_mysql_to_gcs >> gcs_to_bq

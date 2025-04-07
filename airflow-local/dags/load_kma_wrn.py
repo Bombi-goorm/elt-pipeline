@@ -1,6 +1,5 @@
 from airflow import Dataset
 from airflow.decorators import dag
-from airflow.models import Variable
 from include.custom_operators.data_go_abc import PublicDataToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from datetime import datetime, timedelta
@@ -30,16 +29,14 @@ def load_kma_wrn():
         pagination_function=datago_paginate,
         api_type=("query", "serviceKey")
     )
-
-    GCP_PROJECT_ID = Variable.get("GCP_PROJECT_ID")
-    KMA_DATASET = "kma"
-    WRN_TABLE = "wrn"
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
-        gcp_conn_id="gcp-sample",
+        gcp_conn_id="google_cloud_bomnet_conn",
         bucket="bomnet-raw",
         source_objects=["kma/wrn/{{ ds_nodash }}.jsonl"],
-        destination_project_dataset_table=f"{GCP_PROJECT_ID}:{KMA_DATASET}.{WRN_TABLE}",
+        destination_project_dataset_table="{{ var.value.gcp_project_id }}:"
+                                          "{{ var.value.kma_dataset }}."
+                                          "{{ var.value.wrn_table }}",
         schema_object="schemas/kma_wrn_schema.json",
         write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",

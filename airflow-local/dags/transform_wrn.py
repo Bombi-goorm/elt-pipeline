@@ -17,7 +17,7 @@ profile_config = ProfileConfig(
     profile_name="bigquery-db",
     target_name="dev",
     profile_mapping=GoogleCloudServiceAccountDictProfileMapping(
-        conn_id="gcp-sample",
+        conn_id="google_cloud_bomnet_conn",
         profile_args={"project": "goorm-bomnet", "dataset": "kma"}
     ),
 )
@@ -43,7 +43,7 @@ def transform_kma_wrn():
         ),
         profile_config=profile_config,
         execution_config=ExecutionConfig(
-            execution_mode=ExecutionMode.VIRTUALENV,
+            execution_mode=ExecutionMode.VIRTUALENV
         ),
         render_config=RenderConfig(
             select=["stg_kma__wrn+"],
@@ -51,7 +51,7 @@ def transform_kma_wrn():
         ),
         operator_args={
             "py_system_site_packages": False,
-            "py_requirements": ["dbt-bigquery"],  # 또는 사용하는 adapter에 맞춰 변경
+            "py_requirements": ["dbt-bigquery"],
             "install_deps": True
         }
     )

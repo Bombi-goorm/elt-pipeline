@@ -7,7 +7,7 @@ from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQue
 
 
 @dag(
-    schedule_interval=timedelta(hours=2),
+    schedule_interval='0 * * * *',
     start_date=datetime(2025, 2, 18),
     catchup=False,
 )
@@ -29,12 +29,14 @@ def load_mafra_realtime():
     realtime_dataset = Dataset("bigquery://bomnet.realtime")
     load_gcs_to_bq = GCSToBigQueryOperator(
         task_id="load_gcs_to_bq",
-        gcp_conn_id="gcp-sample",
+        gcp_conn_id="google_cloud_bomnet_conn",
         bucket="bomnet-raw",
         source_objects=["mafra/real_time/{{ ds_nodash }}.jsonl"],
-        destination_project_dataset_table="goorm-bomnet:mafra.real_time",
+        destination_project_dataset_table="{{ var.value.gcp_project_id }}:"
+                                          "{{ var.value.mafra_dataset }}."
+                                          "{{ var.value.kat_realtime_table }}",
         schema_object="schemas/kat_real_time_schema.json",
-        write_disposition="WRITE_APPEND",
+        write_disposition="WRITE_TRUNCATE",
         source_format="NEWLINE_DELIMITED_JSON",
         autodetect=True,
         outlets=[realtime_dataset],
