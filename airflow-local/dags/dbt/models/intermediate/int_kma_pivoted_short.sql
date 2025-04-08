@@ -1,6 +1,14 @@
+{{
+  config(
+    materialized='incremental'
+  )
+}}
 with short as (
     select *
     from {{ ref('stg_kma__short') }}
+    {% if is_incremental() %}
+    where fcst_date_time > (select max(fcst_date_time) from {{ this }})
+    {% endif %}
 ),
 
 pivoted_short as (
