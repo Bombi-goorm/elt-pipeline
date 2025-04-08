@@ -1,4 +1,6 @@
 # elt-pipeline
+<img width="446" alt="image" src="https://github.com/user-attachments/assets/5f13962c-4652-421a-87f5-77fd51a1084c" />
+
 <p align="center">
   <img src="docs/title.png" width="1000"/>
 </p>
