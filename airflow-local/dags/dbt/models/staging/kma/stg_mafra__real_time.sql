@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    unique_key=['date_time', 'corp_cd', 'item_id', 'whsl_mrkt_cd'],
+    partition_by={'field': 'date_time', 'data_type': 'timestamp'}
+) }}
+
 with source as (
     select *
     from {{ source('mafra', 'real_time') }}
@@ -27,8 +33,13 @@ cleaned as (
         pkg_cd,
         plor_cd,
         corp_cd,
-        trd_clcln_ymd,
-        from source
+        trd_clcln_ymd
+    from {{ source('mafra', 'real_time') }}
+
+    {% if is_incremental() %}
+    where PARSE_DATETIME('%Y-%m-%d %H:%M:%S', scsbd_dt) >
+          (select max(date_time) from {{ this }})
+    {% endif %}
 )
 
 select *
