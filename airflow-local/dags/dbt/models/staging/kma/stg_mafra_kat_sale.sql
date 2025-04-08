@@ -6,7 +6,7 @@
 
 with source as (
     select *
-    from {{ source('mafra', 'real_time') }}
+    from {{ source('mafra', 'kat_sale') }}
 ),
 
 cleaned as (
